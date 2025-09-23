@@ -12,7 +12,7 @@ It aims to serve both the **existing syllabus** and the **first batch of the new
 - 🔍 **Search & Filter:** Easily search notes by branch, semester, subject, and syllabus version.  
 - 🌐 **Community Contributions:** Students can contribute notes to help peers, fostering collaboration.  
 - 🤖 **Future AI Integration:** Planned AI-powered topic search, summarization, and gap-filling for topics without notes.  
-- 🏆 **Contributor Recognition:** Badges for early or active contributors to motivate participation.  
+- 🏆 **Contributor Recognition:** Badges for early or active contributors to motivate participation. 
 
 ---
 
