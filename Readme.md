@@ -20,7 +20,7 @@ It aims to serve both the **existing syllabus** and the **first batch of the new
 
 - **Frontend:** React.js for an interactive and responsive user interface.  
 - **Backend:** Node.js + Express.js for robust API handling and server logic.  
-- **Database:** MySQL for storing user data and notes metadata.  
+- **Database:** PostgreSQL, SupaBase for storing user data and notes metadata.  
 - **Cloud Storage:** Cloudinary for secure storage and access to uploaded note files.  
 - **AI Integration (Planned):** GPT-based summarizer and search assistant for smarter note discovery.  
 
@@ -38,7 +38,7 @@ It aims to serve both the **existing syllabus** and the **first batch of the new
 ## 👨‍💻 Contributors
 
 - **Harshavardhan B** – Login & Authentication  
-- **Jyothika V** – Notes Frontend  
+- **Jyothika V** – Notes Management  
 - **Prajwal S** – Comments and Admin Controls 
 
 ---
