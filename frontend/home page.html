@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Univ Notes</title>
+  <link rel="stylesheet" href="homepage.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header>
+    <div class="logo-and-title">
+      <img class="logo" src="image/Logo.jpg"/>
+      <h1>Univ Notes</h1>
+    </div>
+    <nav>
+      <a href="#" onclick="showSection('home')">Home</a>
+      <a href="#" onclick="showSection('about')">About Us</a>
+      <a href="#" onclick="showSection('contact')">Contact Us</a>
+      <button class="profile-btn" title="Profile" onclick="alert('Profile clicked!')">
+        <i class="fas fa-user-circle"></i> Profile
+      </button>
+      <button class="toggle-dark" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+      </button>
+    </nav>
+  </header>
+
+ <!--home-->
+  <section id="home">
+    <h2>Select Your Department</h2>
+    <div class="grid" id="departments">
+      <div class="card" onclick="selectDepartment('Computer Science')">
+        <i class="fas fa-laptop-code"></i>
+        <h3>Computer Science (CSE)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Information Science')">
+        <i class="fas fa-database"></i>
+        <h3>Information Science (ISE)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Artificial Intelligence and Machine Learning')">
+        <i class="fas fa-robot"></i>
+        <h3>Artificial Intelligence and Machine Learning (AIML)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Artificial Intelligence and Data Science')">
+        <i class="fas fa-brain"></i>
+        <h3>Artificial Intelligence and Data Science (AIDS)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('ECE')">
+        <i class="fas fa-broadcast-tower"></i>
+        <h3>Electronics & Communication Engineering (ECE)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Electrical and Electronics Engineering')">
+        <i class="fas fa-bolt"></i>
+        <h3>Electronics and Electrical Engineering (EEE)</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Mechanical Engineering')">
+        <i class="fas fa-cogs"></i>
+        <h3>Mechanical Engineering</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Civil Engineering')">
+        <i class="fas fa-hard-hat"></i>
+        <h3>Civil Engineering</h3>
+      </div>
+      <div class="card" onclick="selectDepartment('Architecture')">
+        <i class="fas fa-drafting-compass"></i>
+        <h3>Architecture</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- Department Section -->
+  <section id="department" class="department-section" style="display:none;">
+    <button class="back-btn" onclick="showSection('home')">Back to Home</button>
+    <h2 id="dep-title">Computer Science</h2>
+    <div class="year-list" id="year-list"></div>
+  </section>
+
+  <!-- Subjects Section -->
+  <section id="subjects" class="subject-section" style="display:none;">
+    <button class="back-btn" onclick="showSection('department')">Back to Semesters</button>
+    <h2 id="subject-title">Subjects</h2>
+    <div class="subject-list" id="subject-list"></div>
+  </section>
+
+  <!-- Units Section -->
+  <section id="units" class="unit-section" style="display:none;">
+    <button class="back-btn" onclick="showSection('subjects')">Back to Subjects</button>
+    <h2 id="year-unit-title">Units</h2>
+    <div class="unit-list" id="unit-list"></div>
+  </section>
+
+  <!-- PDFs Section -->
+  <section id="pdfs" class="pdf-section" style="display:none;">
+    <button class="back-btn" onclick="showSection('units')">Back to Units</button>
+    <button class="upload-btn" onclick="toggleUploadForm()">Upload PDF</button>
+    <h2 id="unit-pdf-title">PDFs</h2>
+    
+    <div id="upload-form" class="upload-form" style="display:none;">
+      <h3>Upload PDF</h3>
+      <form id="pdf-upload-form" enctype="multipart/form-data">
+        <input type="file" id="pdf-file" accept=".pdf" required />
+        <button type="submit">Upload</button>
+      </form>
+    </div>
+
+    <div class="pdf-list" id="pdf-list"></div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" style="display:none; max-width: 800px; margin: 40px auto; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 10px;">
+    <h2>About Us</h2>
+    <p>
+      Welcome to UniNotes! Our platform allows students to upload and share notes easily across various departments and academic years.
+    </p>
+  </section>
+  
+  <!--COntact-->
+  <section id="contact" style="display:none; max-width: 800px; margin: 40px auto; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 10px;">
+          <h2>Contact Us!</h2>
+          <p style="color:var(--muted);margin-top:0">Any Suggestions? Send a message — I reply within 48 hours.</p>
+          <form id="contact-form" novalidate>
+            <div class="form-row">
+              <input type="text" id="name" placeholder="Your name" required aria-label="Your name">
+              <input type="email" id="email" placeholder="your mail id" required aria-label="Your email">
+            </div>
+            <div style="margin-top:10px">
+              <textarea id="message" rows="5" placeholder="Tell us your Suggestions!" required aria-label="Message"></textarea>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+              <button type="submit" class="cta" style="cursor: pointer;">Send message</button>
+              <div id="form-status" style="color:var(--muted);font-size:13px">No spam • privacy respected</div>
+            </div>
+          </form>
+
+          <hr style="border:none;border-top:1px solid rgba(206, 22, 22, 0.03);margin:14px 0">
+          <div style="display:flex;flex-direction:column;gap:8px;color:var(--muted)">
+            <div><strong>Email</strong> — <a href="mailto:our - mail - id" style="color:inherit">namma email hakbeku</a></div>
+            <div><strong>Location</strong> — Bangalore, India</div>
+          </div>
+  </section>
+      
+<script src="Home page.js"></script>
+</body>
+</html>
