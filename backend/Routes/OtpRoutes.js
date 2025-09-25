@@ -1,63 +1,10 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
-import connection from '../db.js';
+import supabase from '../db.js';
 import { EmailOtpController, markOtpVerified } from '../AuthControllers/EmailOtpControllers.js';
 const router = express.Router();
 
 {/*------------------------------------------------------------------------------------------------------------*/ }
-// Endpoint to verify OTP to login
-router.post('/verify-otp', async (req, res) => {
-  const { email, otp } = req.body;
-
-  if (!email || !otp) {
-    return res.status(400).json({ error: 'Email and OTP required' });
-  }
-
-  try {
-    const storedOtp = await EmailOtpController(email);
-
-    if (!storedOtp) return res.status(400).json({ error: 'No OTP found' });
-
-    if (new Date() > new Date(storedOtp.OTP_expiresAt)) {
-      return res.status(400).json({ error: 'OTP expired' });
-    }
-
-    if (otp.toString().trim() !== storedOtp.otp.toString().trim()) {
-      return res.status(400).json({ error: 'Invalid OTP' });
-    }
-
-    await markOtpVerified(email);
-
-    // Now copy signup credentials into login table
-    connection.query('SELECT password FROM signup WHERE email = ?', [email], (err, results) => {
-      if (err || results.length === 0) {
-        return res.status(400).json({ error: 'User not found for login creation' });
-      }
-      const password = results[0].password;
-      connection.query(
-        'INSERT INTO login (login_email, login_password) VALUES (?, ?)',
-        [email, password],
-        (loginErr) => {
-          if (loginErr) {
-            return res.status(500).json({ error: 'Failed to create login data' });
-          }
-
-          // Only now send success!
-          return res.json({ success: true });
-
-        }
-      );
-    });
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({ error: 'Server error verifying OTP' });
-  }
-});
-
-
-
-
-
 
 
 // Endpoint to send OTP to login
@@ -69,20 +16,22 @@ router.post('/send-otp', async (req, res) => {
     return res.status(400).json({ error: 'Email required' });
   }
 
-  const sixHoursAgo = new Date(Date.now() - (6 * 60 * 60 * 1000));
-  const countQuery = `
-    SELECT COUNT(*) AS count
-    FROM email_otps
-    WHERE OTP_email = ? AND OTP_createdAt > ?
-  `;
+  try {
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
 
-  connection.query(countQuery, [email, sixHoursAgo], (countErr, countResults) => {
-    if (countErr) {
-      console.error('Error counting OTPs:', countErr);
+    // Count OTPs in last 6 hours
+    const { data: countData, error: countError, count } = await supabase
+      .from('email_otps')
+      .select('otp_id', { count: 'exact', head: true })
+      .gte('otp_createdat', sixHoursAgo)
+      .eq('otp_email', email);
+
+    if (countError) {
+      console.error('Error counting OTPs:', countError);
       return res.status(500).json({ error: 'Server error' });
     }
 
-    if (countResults[0].count >= 3) {
+    if (count >= 3) {
       return res.status(429).json({ error: 'Exceeded OTP limit' });
     }
 
@@ -90,61 +39,123 @@ router.post('/send-otp', async (req, res) => {
       host: process.env.EMAIL_HOST,
       port: Number(process.env.EMAIL_PORT),
       secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 
-    transporter.sendMail({
+    await transporter.sendMail({
       to: email,
       subject: 'UniNotes',
-      html: `<p>Welcome to <strong>UniNotes</strong></p>
-             <p>Your OTP code is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
-             <p>Do not share this OTP with anyone.</p>`,
-    }, (mailErr) => {
-      if (mailErr) {
-        console.error('Error sending OTP email:', mailErr);
-        return res.status(500).json({ error: 'Failed to send OTP email' });
-      }
-
-      console.log('Login OTP sent');
-
-      const expiresAt = new Date(Date.now() + 5 * 60000);
-      const insertOtpQuery = `
-        INSERT INTO email_otps (OTP_email, otp, OTP_expiresAt)
-        VALUES (?, ?, ?)
-      `;
-      connection.query(insertOtpQuery, [email, otp, expiresAt], (insertErr) => {
-        if (insertErr) {
-          console.error('Error saving OTP', insertErr);
-        }
-        return res.json({ success: true });
-      });
+      html: `<p>Welcome to <strong>UniNotes</strong></p><p>Your OTP code is <strong>${otp}</strong>. It is valid for 5 minutes.</p><p>Do not share this OTP with anyone.</p>`,
     });
-  });
+
+    const now = new Date();
+    const IST_OFFSET = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+
+    const createdAtIST = new Date(now.getTime() + IST_OFFSET).toISOString();
+    const expiresAtIST = new Date(now.getTime() + 5 * 60 * 1000 + IST_OFFSET).toISOString();
+
+    const { error: insertError } = await supabase.from('email_otps').insert([
+      {
+        otp_email: email,
+        otp,
+        otp_createdat: createdAtIST,
+        otp_expiresat: expiresAtIST,
+      },
+    ]);
+
+    if (insertError) {
+      console.error('Error saving OTP:', insertError);
+      return res.status(500).json({ error: 'Error saving OTP' });
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error in send-otp:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
 });
 
 
 
+// Endpoint to verify OTP to login
+
+router.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ error: 'Email and OTP required' });
+  }
+
+  try {
+    const storedOtp = await EmailOtpController(email);
+
+    if (!storedOtp) return res.status(400).json({ error: 'No OTP found' });
+   
+    const now = Date.now();
+    const expires = new Date(storedOtp.otp_expiresat).getTime();
+
+    if (now > expires) {
+      return res.status(400).json({ error: 'OTP expired' });
+    }
+
+
+    if (otp.toString().trim() !== storedOtp.otp.toString().trim()) {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+
+    // Continue rest of code...
+    await markOtpVerified(email);
+
+    const { data: signupData, error: signupError } = await supabase
+      .from('signup')
+      .select('password')
+      .eq('email', email)
+      .limit(1);
+
+    if (signupError || !signupData || signupData.length === 0) {
+      return res.status(400).json({ error: 'User not found for login creation' });
+    }
+
+    const password = signupData[0].password;
+
+    const { error: loginError } = await supabase
+      .from('login')
+      .insert([{ login_email: email, login_password: password }]);
+
+    if (loginError) {
+      return res.status(500).json({ error: 'Failed to create login data' });
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    return res.status(500).json({ error: 'Server error verifying OTP' });
+  }
+});
 
 
 
 {/*------------------------------------------------------------------------------------------------------------*/ }
 // Endpoint to check if email is registered to reset password
-router.post('/check-email', (req, res) => {
+router.post('/check-email', async (req, res) => {
   const { email } = req.body;
-  connection.query('SELECT 1 FROM signup WHERE email = ? LIMIT 1', [email], (err, results) => {
-    if (err) {
-      console.error('Error checking email existence:', err);
+  try {
+    const { data, error } = await supabase
+      .from('signup')
+      .select('email')
+      .eq('email', email)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking email existence:', error);
       return res.status(500).json({ error: 'Server error' });
     }
-    if (results.length > 0) {
-      return res.json({ exists: true });
-    } else {
-      return res.json({ exists: false });
-    }
-  });
+
+    return res.json({ exists: data.length > 0 });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
 });
 
 
@@ -160,72 +171,82 @@ router.post('/send-resetpassword-otp', async (req, res) => {
     return res.status(400).json({ error: 'Email required' });
   }
 
-  connection.query('SELECT 1 FROM signup WHERE email = ? LIMIT 1', [email], (emailErr, emailResults) => {
-    if (emailErr) {
-      console.error('Error checking email before sending reset OTP:', emailErr);
+  try {
+    // Check if email exists in signup
+    const { data: emailData, error: emailError } = await supabase
+      .from('signup')
+      .select('email')
+      .eq('email', email)
+      .limit(1);
+
+    if (emailError) {
+      console.error('Error checking email before sending reset OTP:', emailError);
       return res.status(500).json({ error: 'Server error' });
     }
-    if (emailResults.length === 0) {
+    if (!emailData.length) {
       return res.status(400).json({ error: 'Email not registered' });
     }
 
-    const sixHoursAgo = new Date(Date.now() - (6 * 60 * 60 * 1000));
-    const countQuery = `
-      SELECT COUNT(*) AS count
-FROM password_reset_otps
-WHERE Reset_OTP_email = ? AND Reset_OTP_createdAt > ?
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
 
-    `;
+    // Count reset OTPs sent in last 6 hours
+    const { data: otpData, error: otpError, count } = await supabase
+      .from('password_reset_otps')
+      .select('reset_otp_id', { count: 'exact', head: true })
+      .gte('reset_otp_createdat', sixHoursAgo)
+      .eq('reset_otp_email', email);
 
-    connection.query(countQuery, [email, sixHoursAgo], (countErr, countResults) => {
-      if (countErr) {
-        console.error('Error counting reset OTPs:', countErr);
-        return res.status(500).json({ error: 'Server error' });
-      }
+    if (otpError) {
+      console.error('Error counting reset OTPs:', otpError);
+      return res.status(500).json({ error: 'Server error' });
+    }
 
-      if (countResults[0].count >= 3) {
-        return res.status(429).json({ error: 'Exceeded OTP limit' });
-      }
+    if (count >= 3) {
+      return res.status(429).json({ error: 'Exceeded OTP limit' });
+    }
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.PASSWORD_RESET_EMAIL_HOST,
-        port: Number(process.env.PASSWORD_RESET_EMAIL_PORT),
-        secure: false,
-        auth: {
-          user: process.env.PASSWORD_RESET_EMAIL_USER,
-          pass: process.env.PASSWORD_RESET_EMAIL_PASS,
-        },
-      });
-
-      transporter.sendMail({
-        to: email,
-        subject: 'UniNotes Password Reset',
-        html: `<p>Welcome to <strong>UniNotes</strong></p>
-              <p>You requested to reset your UniNotes password.</p>
-               <p>Your OTP code is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
-               <p>Do not share this OTP with anyone.</p>`,
-      }, (mailErr) => {
-        if (mailErr) {
-          console.error('Error sending reset password OTP email:', mailErr);
-          return res.status(500).json({ error: 'Failed to send OTP email' });
-        }
-
-        console.log('Reset password OTP sent');
-
-        const expiresAt = new Date(Date.now() + 5 * 60000);
-        const insertOtpQuery = `
-          INSERT INTO password_reset_otps (Reset_OTP_email, Reset_otp, Reset_OTP_expiresAt)
-          VALUES (?, ?, ?)
-        `;
-        connection.query(insertOtpQuery, [email, otp, expiresAt], (insertErr) => {
-          if (insertErr) {
-            console.error('Error saving reset OTP', insertErr);
-          }
-          return res.json({ success: true });
-        });
-      });
+    const transporter = nodemailer.createTransport({
+      host: process.env.PASSWORD_RESET_EMAIL_HOST,
+      port: Number(process.env.PASSWORD_RESET_EMAIL_PORT),
+      secure: false,
+      auth: {
+        user: process.env.PASSWORD_RESET_EMAIL_USER,
+        pass: process.env.PASSWORD_RESET_EMAIL_PASS,
+      },
     });
-  });
+
+    await transporter.sendMail({
+      to: email,
+      subject: 'UniNotes Password Reset',
+      html: `<p>Welcome to <strong>UniNotes</strong></p>
+             <p>You requested to reset your UniNotes password.</p>
+             <p>Your OTP code is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
+             <p>Do not share this OTP with anyone.</p>`,
+    });
+
+    // IST offset
+    const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000 + IST_OFFSET).toISOString();
+
+    // Insert reset OTP entry with IST expiration time
+    const { error: insertError } = await supabase.from('password_reset_otps').insert([
+      {
+        reset_otp_email: email,
+        reset_otp: otp,
+        reset_otp_expiresat: expiresAt,
+      },
+    ]);
+
+    if (insertError) {
+      console.error('Error saving reset OTP', insertError);
+      return res.status(500).json({ error: 'Error saving OTP' });
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Error in send-resetpassword-otp:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
 });
 
 
@@ -240,48 +261,46 @@ router.post('/verify-resetpassword-otp', async (req, res) => {
   }
 
   try {
-    connection.query(
-      'SELECT * FROM password_reset_otps WHERE Reset_OTP_email = ? ORDER BY Reset_OTP_createdAt DESC LIMIT 1',
-      [email],
-      (err, results) => {
-        if (err) {
-          console.error('Error fetching reset OTP:', err);
-          return res.status(500).json({ error: 'Server error fetching OTP' });
-        }
+    const { data: results, error: fetchError } = await supabase
+      .from('password_reset_otps')
+      .select('*')
+      .eq('reset_otp_email', email)
+      .order('reset_otp_createdat', { ascending: false })
+      .limit(1);
 
-        if (results.length === 0) {
-          return res.status(400).json({ error: 'No OTP found' });
-        }
+    if (fetchError) {
+      console.error('Error fetching reset OTP:', fetchError);
+      return res.status(500).json({ error: 'Server error fetching OTP' });
+    }
 
-        const storedOtp = results[0];
+    if (!results || results.length === 0) {
+      return res.status(400).json({ error: 'No OTP found' });
+    }
 
-        if (new Date() > new Date(storedOtp.Reset_OTP_expiresAt)) {
-          return res.status(400).json({ error: 'OTP expired' });
-        }
+    const storedOtp = results[0];
 
-        if (otp.toString().trim() !== storedOtp.Reset_otp.toString().trim()) {
-          return res.status(400).json({ error: 'Invalid OTP' });
-        }
+    if (new Date() > new Date(storedOtp.reset_otp_expiresat)) {
+      return res.status(400).json({ error: 'OTP expired' });
+    }
 
-        // Mark OTP as verified
-        connection.query(
-          'UPDATE password_reset_otps SET Reset_OTP_verified = TRUE WHERE Reset_OTP_email = ?',
-          [email],
-          (updateErr) => {
-            if (updateErr) {
-              console.error('Error marking reset OTP verified:', updateErr);
-              return res.status(500).json({ error: 'Server error marking OTP verified' });
-            }
+    if (otp.toString().trim() !== storedOtp.reset_otp.toString().trim()) {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
 
-            // Allow user to proceed with password reset (response success)
-            return res.json({ success: true });
-          }
-        );
-      }
-    );
-  } catch (error) {
-    console.error('Error verifying reset password OTP:', error);
-    res.status(500).json({ error: 'Server error verifying OTP' });
+    const { error: updateError } = await supabase
+      .from('password_reset_otps')
+      .update({ reset_otp_verified: true })
+      .eq('reset_otp_email', email);
+
+    if (updateError) {
+      console.error('Error marking reset OTP verified:', updateError);
+      return res.status(500).json({ error: 'Server error marking OTP verified' });
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Error verifying reset password OTP:', err);
+    return res.status(500).json({ error: 'Server error verifying OTP' });
   }
 });
 
@@ -294,11 +313,9 @@ router.post('/verify-resetpassword-otp', async (req, res) => {
 //Setting up new password
 
 // Endpoint to update password in signup and login tables
-// Endpoint to update password in both signup and login tables
-router.post('/update-password', (req, res) => {
+router.post('/update-password', async (req, res) => {
   const { email, newPassword, confirmPassword } = req.body;
 
-  // Validate request
   if (!email || !newPassword || !confirmPassword) {
     return res.status(400).json({ error: 'Email, new password, and confirm password are required' });
   }
@@ -307,26 +324,36 @@ router.post('/update-password', (req, res) => {
     return res.status(400).json({ error: 'Passwords do not match' });
   }
 
-  // Update in signup table
-  const updateSignupQuery = 'UPDATE signup SET password = ? WHERE email = ?';
-  connection.query(updateSignupQuery, [newPassword, email], (err, result) => {
-    if (err) {
-      console.error('Error updating password in signup:', err);
+  try {
+    // Update in signup table
+    const { error: signupError } = await supabase
+      .from('signup')
+      .update({ password: newPassword })
+      .eq('email', email);
+
+    if (signupError) {
+      console.error('Error updating password in signup:', signupError);
       return res.status(500).json({ error: 'Server error updating signup password' });
     }
 
     // Update in login table
-    const updateLoginQuery = 'UPDATE login SET login_password = ? WHERE login_email = ?';
-    connection.query(updateLoginQuery, [newPassword, email], (loginErr, loginResult) => {
-      if (loginErr) {
-        console.error('Error updating password in login:', loginErr);
-        return res.status(500).json({ error: 'Server error updating login password' });
-      }
+    const { error: loginError } = await supabase
+      .from('login')
+      .update({ login_password: newPassword })
+      .eq('login_email', email);
 
-      return res.json({ success: true, message: 'Password updated successfully.' });
-    });
-  });
+    if (loginError) {
+      console.error('Error updating password in login:', loginError);
+      return res.status(500).json({ error: 'Server error updating login password' });
+    }
+
+    return res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('Unexpected error updating password:', err);
+    return res.status(500).json({ error: 'Server error updating password' });
+  }
 });
+
 
 
 

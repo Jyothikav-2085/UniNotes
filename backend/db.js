@@ -1,15 +1,8 @@
-import mysql from 'mysql2';  // Use 'mysql2' if you installed it
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT
-});
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-export default connection;
-
+export default supabase;

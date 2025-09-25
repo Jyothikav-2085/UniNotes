@@ -1,0 +1,77 @@
+.background {
+  background-image: "/UniNotesAuth.png"; /* Use your background pattern image */
+  background-repeat: repeat;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.1);
+  padding: 60px 40px;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.logo {
+  width: 140px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.uni {
+  color: #D6336C;
+}
+
+.notes {
+  color: #2563EB;
+}
+
+.subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 32px;
+  color: #212121;
+  font-weight: 500;
+}
+
+.login-btn {
+  background: #FFD60A;
+  color: #212121;
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 48px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 16px;
+  transition: background 0.2s;
+}
+
+.login-btn:hover {
+  background: #eac008;
+}
+
+.signup-text {
+  font-size: 1rem;
+  margin-top: 12px;
+}
+
+.signup-link {
+  color: #FFD60A;
+  font-weight: 600;
+  text-decoration: none;
+  padding-left: 4px;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}

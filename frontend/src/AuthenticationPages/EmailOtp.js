@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './EmailOtp.css';
 
 export default function EmailOtp() {
-
   const location = useLocation();
   const userEmail = location.state?.email || '';
 
@@ -35,44 +34,51 @@ export default function EmailOtp() {
     }
   };
 
-  // sending otp to the email
+  // sending otp to the email with improved error handling
   const handleSendOtp = async () => {
     if (!userEmail) {
       toast.error('No email available to send OTP', { position: 'top-center', duration: 3000 });
       return;
     }
     setSending(true);
-    const res = await fetch('http://localhost:5001/otp/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: userEmail }),
-    });
+    try {
+      const res = await fetch('http://localhost:5001/otp/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      });
 
-    if (res.ok) {
-      toast.success(`OTP sent to ${userEmail}`, { position: 'top-center', duration: 3000 });
-      setTimer(120);
-      let countdown = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdown);
-            setSending(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      const data = await res.json();
-      if (res.status === 429 && data.error === 'Exceeded OTP limit') {
-        toast.error('Exceeded OTP limit! Try after 6 hrs', { position: 'top-center', duration: 3000 });
+      if (res.ok) {
+        toast.success(`OTP sent to ${userEmail}`, { position: 'top-center', duration: 3000 });
+        setTimer(120);
+        let countdown = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(countdown);
+              setSending(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
       } else {
-        toast.error('Failed to send OTP', { position: 'top-center', duration: 3000 });
+        // Read error response more carefully
+        const data = await res.json().catch(() => ({}));
+        const errorMsg = data.error || `Failed to send OTP (status ${res.status})`;
+        if (res.status === 429 && data.error === 'Exceeded OTP limit') {
+          toast.error('Exceeded OTP limit! Try after 6 hrs', { position: 'top-center', duration: 3000 });
+        } else {
+          toast.error(errorMsg, { position: 'top-center', duration: 3000 });
+        }
+        setSending(false);
       }
+    } catch (err) {
+      toast.error(`Error sending OTP: ${err.message}`, { position: 'top-center', duration: 3000 });
       setSending(false);
     }
   };
 
-  // verification of otp or finding errors in the submission of otp 
+  // verification of otp or finding errors in the submission of otp
   const handleSubmit = async (e) => {
     e.preventDefault();
     const otp = inputRefs.current.map(input => input.value).join('');
@@ -103,8 +109,6 @@ export default function EmailOtp() {
     }
   };
 
-
-  //jsx components
   return (
     <>
       <Toaster />

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import connection from './db.js'; // Import the database connection
+import supabase from './db.js';
 
 import createSignUpTable from './AuthDBSchema/SignUpDB.js'; // Import the function to create the SignUp table
 import { signupController } from './AuthControllers/SignUpControllers.js'; // Import the signup controller
@@ -11,72 +11,63 @@ import createLogInTable from './AuthDBSchema/LogInDB.js'; // Import the function
 import { loginController } from './AuthControllers/LogInControllers.js'; // Import the login controller
 
 import createEmailOtpTable from './AuthDBSchema/EmailOtpDB.js'; // Import the function to create the Email OTP table
-import createResetPasswordOtpTable from './AuthDBSchema/ResetPasswordOtpDB.js';// Import the fuctions to create the password reset otp table
+import createResetPasswordOtpTable from './AuthDBSchema/ResetPasswordOtpDB.js'; // Import the function to create the password reset otp table
 import otpRoutes from './Routes/OtpRoutes.js'; // Import OTP routes
 
 import { googleController } from './AuthControllers/GoogleControllers.js'; // Import the Google controller
-
-
-
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.json()) ;
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Create the SignUp table if it doesn't exist
-createSignUpTable();
-// Define the /signup endpoint
+// Define endpoints and routes
 app.post('/signup', (req, res) => {
-  signupController(req, res, connection);
+  signupController(req, res, supabase);
 });
 
-// Create the LogIn table if it doesn't exist
-createLogInTable();
-// Define the /login endpoint
 app.post('/login', (req, res) => {
-  loginController(req, res, connection);
+  loginController(req, res, supabase);
 });
 
-// Create the Email OTP table if it doesn't exist
-createEmailOtpTable();
-// Create the Password Reset Table if it doesn't exist
-createResetPasswordOtpTable();
-// Use the OTP routes
 app.use('/otp', otpRoutes);
 
-
-// Define the /google endpoint
 app.post('/google', (req, res) => {
-  googleController(req, res, connection);
+  googleController(req, res, supabase);
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Test the database connection
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;
+// Check Supabase connection on startup
+const checkSupabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase.from('signup').select('id').limit(1);
+    if (error) {
+      console.error('Error connecting to Supabase:', error);
+    } else {
+      console.log('Connected to Supabase database successfully!');
+    }
+  } catch (err) {
+    console.error('Unexpected error checking Supabase connection:', err);
   }
-  console.log('Connected to the MySQL database!');
-});
+};
 
-// Define a simple route to test the server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Immediately Invoked Async Function to create tables then start server and check DB connection
+(async () => {
+  try {
+    await createSignUpTable();
+    await createLogInTable();
+    await createEmailOtpTable();
+    await createResetPasswordOtpTable();
 
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+    await checkSupabaseConnection();
+  } catch (err) {
+    console.error('Error during startup:', err);
+  }
+})();

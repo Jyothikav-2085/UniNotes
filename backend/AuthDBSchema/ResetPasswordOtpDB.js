@@ -1,24 +1,35 @@
-import connection from '../db.js';
+import { Client } from 'pg';
+import dotenv from 'dotenv';
 
-const createResetPasswordOtpTable = () => {
+dotenv.config();
+
+const client = new Client({
+  connectionString: process.env.SUPABASE_DB_URL,
+  ssl: { rejectUnauthorized: false }, 
+});
+
+
+const createResetPasswordOtpTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS password_reset_otps (
-      Reset_OTP_id INT AUTO_INCREMENT PRIMARY KEY,
-      Reset_OTP_email VARCHAR(100) NOT NULL,
-      Reset_otp VARCHAR(6) NOT NULL,
-      Reset_OTP_expiresAt DATETIME NOT NULL,
-      Reset_OTP_verified BOOLEAN DEFAULT FALSE,
-      Reset_OTP_createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      reset_otp_id SERIAL PRIMARY KEY,
+      reset_otp_email VARCHAR(100) NOT NULL,
+      reset_otp VARCHAR(6) NOT NULL,
+      reset_otp_expiresat TIMESTAMP NOT NULL,
+      reset_otp_verified BOOLEAN DEFAULT FALSE,
+      reset_otp_createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
 
-  connection.query(createTableQuery, (err, results) => {
-    if (err) {
-      console.error('Error creating password_reset_otps table:', err);
-    } else {
-      console.log('password_reset_otps table created.');
-    }
-  });
+  try {
+    await client.connect();
+    await client.query(createTableQuery);
+    console.log('password_reset_otps table created.');
+  } catch (err) {
+    console.error('Error creating password_reset_otps table:', err);
+  } finally {
+    await client.end();
+  }
 };
 
 export default createResetPasswordOtpTable;

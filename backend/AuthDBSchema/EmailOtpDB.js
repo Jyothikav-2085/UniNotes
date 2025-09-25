@@ -1,24 +1,35 @@
-import connection from '../db.js';
+import { Client } from 'pg';
+import dotenv from 'dotenv';
 
-const createEmailOtpTable = () => {
+dotenv.config();
+
+const client = new Client({
+  connectionString: process.env.SUPABASE_DB_URL,
+  ssl: { rejectUnauthorized: false },
+});
+
+
+const createEmailOtpTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS email_otps (
-      OTP_id INT AUTO_INCREMENT PRIMARY KEY,
-      OTP_email VARCHAR(100) NOT NULL,
-      otp VARCHAR(6) NOT NULL,
-      OTP_expiresAt DATETIME NOT NULL,
-      OTP_verified BOOLEAN DEFAULT FALSE,
-      OTP_createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      otp_id SERIAL PRIMARY KEY,
+  otp_email VARCHAR(100) NOT NULL,
+  otp VARCHAR(6) NOT NULL,
+  otp_createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  otp_verified BOOLEAN DEFAULT FALSE,
+   otp_expiresat TIMESTAMP NOT NULL
     );
   `;
 
-  connection.query(createTableQuery, (err, results) => {
-    if (err) {
-      console.error('Error creating email_otps table:', err);
-    } else {
-      console.log('email_otps table created.');
-    }
-  });
+  try {
+    await client.connect();
+    await client.query(createTableQuery);
+    console.log('email_otps table created.');
+  } catch (err) {
+    console.error('Error creating email_otps table:', err);
+  } finally {
+    await client.end();
+  }
 };
 
 export default createEmailOtpTable;

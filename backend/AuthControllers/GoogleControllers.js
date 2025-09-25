@@ -1,21 +1,30 @@
-// AuthControllers/googlecontrollers.js
-
-export const googleController = (req, res, connection) => {
+export const googleController = async (req, res, supabase) => {
   const { name, email, google_id, avatar } = req.body;
 
-  // Insert into signup table (use google_id as password placeholder)
-  const signupQuery = 'INSERT INTO signup (name, email, password) VALUES (?, ?, ?)';
-  connection.query(signupQuery, [name, email, google_id], (signupErr) => {
-    if (signupErr && signupErr.code !== 'ER_DUP_ENTRY') {
-      return res.status(500).json({ error: 'Signup DB error', details: signupErr });
+  try {
+
+    
+    // Insert into signup table
+    const { error: signupError } = await supabase
+      .from('signup')
+      .insert([{ name, email, password: google_id }]);
+
+    if (signupError && signupError.code !== '23505') { // 23505 is Postgres unique violation, equivalent of ER_DUP_ENTRY
+      return res.status(500).json({ error: 'Signup DB error', details: signupError });
     }
-    // Insert into login table with correct column names
-    const loginQuery = 'INSERT INTO login (login_email, login_password) VALUES (?, ?)';
-    connection.query(loginQuery, [email, google_id], (loginErr) => {
-      if (loginErr && loginErr.code !== 'ER_DUP_ENTRY') {
-        return res.status(500).json({ error: 'Login DB error', details: loginErr });
-      }
-      return res.status(201).json({ message: 'Google user saved to both tables' });
-    });
-  });
+
+
+    // Insert into login table
+    const { error: loginError } = await supabase
+      .from('login')
+      .insert([{ login_email: email, login_password: google_id }]);
+
+    if (loginError && loginError.code !== '23505') {
+      return res.status(500).json({ error: 'Login DB error', details: loginError });
+    }
+
+    return res.status(201).json({ message: 'Google user saved to both tables' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Unexpected error', details: err.message });
+  }
 };

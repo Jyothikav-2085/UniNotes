@@ -13,6 +13,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.2",
     "jwd": "^1.1.0",
     "jwt-decode": "^4.0.0",
