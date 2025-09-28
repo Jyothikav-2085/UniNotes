@@ -10,7 +10,7 @@ import PasswordOtp from './AuthenticationPages/PasswordOtp';
 import SetNewPassword from './AuthenticationPages/SetNewPassword';
 import GoogleLoginPage from './AuthenticationPages/google';
 // Importing the home page-related pages
-import HomePage from './HomePage/HomePage';
+import HomePage from './HomePage/Home';
 
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
           <Route path="/SetNewPassword" element={<SetNewPassword />} />
           <Route path="/google" element={<GoogleLoginPage />} />
 
-          {/* Route for the home page */}
+          {/* Route for all the pages after home page */}
           <Route path="/home" element={<HomePage />} />
 
         </Routes>
