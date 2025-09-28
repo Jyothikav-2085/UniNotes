@@ -28,26 +28,247 @@ const Home = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedUnit, setSelectedUnit] = useState("");
   const [pdfStorage, setPdfStorage] = useState({});
-
   const isPopState = useRef(false);
 
-  const subjectsData = {
-    "1 Semester": ["Mathematics I", "Physics", "Programming in C", "Basic Electrical", "Engineering Graphics"],
-    "2 Semester": ["Mathematics II", "Chemistry", "Data Structures", "Electronics", "Mechanics"],
+  // Subjects and Units organized by department -> semester -> subjects -> units
+  const departmentData = {
+    "Computer Science": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ }
+    },
+    "Information Science": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming Basics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Digital Logic": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": { /* fill with unique subjects */ },
+      // 
+    },
+    "AIML": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ }
+      
+    },
+    "AIDS": { "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ }
+    },
+
+    "ECE": { 
+      "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ }
+     },
+
+    "EEE": { "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ } },
+
+    "Mechanical": { "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ } 
+    },
+
+    "Civil": { "1 Semester": {
+        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+   
+      "3 Semester": {
+        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
+        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+      },
+      "4 Semester": {  },
+      "5 Semester": {    },
+      "6 Semester": {  },
+      "7 Semester": { /* ... */ },
+      "8 Semester": { /* ... */ } 
+    },
+
+    "Architecture": {
+      "1 Semester": { },
+      "2 Semester": {  },
+      "3 Semester": {  },
+      "4 Semester": {  },
+      "5 Semester": {  },
+      "6 Semester": { },
+      "7 Semester": { },
+      "8 Semester":  {},
+      "9 Semester": { },
+      "10 Semester": {  }
+    }
   };
 
-  // Push history only for forward navigation
+  // Push and popstate handlers
   useEffect(() => {
     if (!isPopState.current) {
-      window.history.pushState(
-        { section, selectedDep, selectedYear, selectedSubject, selectedUnit },
-        ""
-      );
+      window.history.pushState({ section, selectedDep, selectedYear, selectedSubject, selectedUnit }, "");
     }
     isPopState.current = false;
   }, [section, selectedDep, selectedYear, selectedSubject, selectedUnit]);
 
-  // Listen for browser back/forward buttons
   useEffect(() => {
     const handlePopState = (event) => {
       if (event.state) {
@@ -63,41 +284,27 @@ const Home = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // Toggle dark mode
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  // Navigation functions
-  const selectDepartment = (dep) => {
-    setSelectedDep(dep);
-    setSection("department");
-  };
-
-  const selectYear = (year) => {
-    setSelectedYear(year);
-    setSection("subjects");
-  };
-
-  const selectSubject = (sub) => {
-    setSelectedSubject(sub);
-    setSection("units");
-  };
-
-  const selectUnit = (unit) => {
-    setSelectedUnit(unit);
-    setSection("pdfs");
-  };
+  const selectDepartment = (dep) => { setSelectedDep(dep); setSection("department"); };
+  const selectYear = (year) => { setSelectedYear(year); setSection("subjects"); };
+  const selectSubject = (sub) => { setSelectedSubject(sub); setSection("units"); };
+  const selectUnit = (unit) => { setSelectedUnit(unit); setSection("pdfs"); };
 
   const handlePDFUpload = (e) => {
     e.preventDefault();
     const file = e.target.elements["pdf-file"].files[0];
     if (!file) return;
-    const key = `${selectedYear}-${selectedSubject}-${selectedUnit}`;
-    setPdfStorage((prev) => ({
+    const key = `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`;
+    setPdfStorage(prev => ({
       ...prev,
       [key]: [...(prev[key] || []), file.name],
     }));
     e.target.reset();
   };
+
+  const getSubjects = () => departmentData[selectedDep]?.[selectedYear] || {};
+  const getUnits = () => getSubjects()[selectedSubject] || [];
 
   return (
     <div className={darkMode ? "dark-mode" : ""}>
@@ -108,93 +315,62 @@ const Home = () => {
           <h1>Univ Notes</h1>
         </div>
         <nav>
-          <button onClick={() => setSection("home")}>Home</button>
+          <button onClick={() => { setSection("home"); setSelectedDep(""); setSelectedYear(""); setSelectedSubject(""); setSelectedUnit(""); }}>Home</button>
           <button onClick={() => setSection("about")}>About Us</button>
           <button onClick={() => setSection("contact")}>Contact Us</button>
-          <button className="profile-btn">
-            <FontAwesomeIcon icon={faUserCircle} /> Profile
-          </button>
-          <button className="toggle-dark" onClick={toggleDarkMode}>
-            <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
-          </button>
+          <button className="profile-btn"><FontAwesomeIcon icon={faUserCircle}/> Profile</button>
+          <button className="toggle-dark" onClick={toggleDarkMode}><FontAwesomeIcon icon={darkMode ? faSun : faMoon}/></button>
         </nav>
       </header>
 
-      {/* Home Section */}
+      {/* Sections rendering */}
       {section === "home" && (
         <section id="home">
           <h2>Select Your Department</h2>
           <div className="grid">
-            <div className="card" onClick={() => selectDepartment("Computer Science")}>
-              <FontAwesomeIcon icon={faLaptopCode} />
-              <h3>Computer Science (CSE)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("Information Science")}>
-              <FontAwesomeIcon icon={faDatabase} />
-              <h3>Information Science (ISE)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("AIML")}>
-              <FontAwesomeIcon icon={faRobot} />
-              <h3>Artificial Intelligence and Machine Learning (AIML)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("AIDS")}>
-              <FontAwesomeIcon icon={faBrain} />
-              <h3>Artificial Intelligence and Data Science (AIDS)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("ECE")}>
-              <FontAwesomeIcon icon={faBroadcastTower} />
-              <h3>Electronics & Communication (ECE)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("EEE")}>
-              <FontAwesomeIcon icon={faBolt} />
-              <h3>Electrical & Electronics (EEE)</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("Mechanical")}>
-              <FontAwesomeIcon icon={faCogs} />
-              <h3>Mechanical Engineering</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("Civil")}>
-              <FontAwesomeIcon icon={faHardHat} />
-              <h3>Civil Engineering</h3>
-            </div>
-            <div className="card" onClick={() => selectDepartment("Architecture")}>
-              <FontAwesomeIcon icon={faDraftingCompass} />
-              <h3>Architecture</h3>
-            </div>
+            {Object.keys(departmentData).map(dep => (
+              <div key={dep} className="card" onClick={() => selectDepartment(dep)}>
+                <FontAwesomeIcon icon={
+                  dep==="Computer Science"?faLaptopCode:
+                  dep==="ECE"?faBroadcastTower:
+                  dep==="AIML"?faRobot:
+                  dep==="AIDS"?faBrain:
+                  dep==="EEE"?faBolt:
+                  dep==="Mechanical"?faCogs:
+                  dep==="Civil"?faHardHat:
+                  dep==="Architecture"?faDraftingCompass:
+                  faDatabase
+                }/>
+                <h3>{dep}</h3>
+              </div>
+            ))}
           </div>
         </section>
       )}
 
-      {/* Department Section */}
       {section === "department" && (
         <section>
-          <button className="back-btn" onClick={() => setSection("home")}>
-            Back to Home
-          </button>
+          <button className="back-btn" onClick={()=>setSection("home")}>Back to Home</button>
           <h2>{selectedDep}</h2>
           <div className="year-list">
-            {(selectedDep === "Architecture" ? 10 : 8) &&
-              [...Array(selectedDep === "Architecture" ? 10 : 8)].map((_, i) => (
-                <div key={i} className="year-item" onClick={() => selectYear(`${i + 1} Semester`)}>
-                  <FontAwesomeIcon icon={faGraduationCap} />
-                  <p>{i + 1} Semester</p>
-                </div>
-              ))}
+            {Object.keys(departmentData[selectedDep]).map(year=>(
+              <div key={year} className="year-item" onClick={()=>selectYear(year)}>
+                <FontAwesomeIcon icon={faGraduationCap}/>
+                <p>{year}</p>
+              </div>
+            ))}
           </div>
         </section>
       )}
 
-      {/* Subjects Section */}
       {section === "subjects" && (
         <section>
-          <button className="back-btn" onClick={() => setSection("department")}>
-            Back to Semesters
-          </button>
+          <button className="back-btn" onClick={()=>setSection("department")}>Back to Semesters</button>
           <h2>{selectedYear} - Subjects</h2>
           <div className="subject-list">
-            {(subjectsData[selectedYear] || ["Subject 1", "Subject 2"]).map((sub, i) => (
-              <div key={i} className="year-item" onClick={() => selectSubject(sub)}>
-                <FontAwesomeIcon icon={faBook} />
+            {Object.keys(getSubjects()).map(sub=>(
+              <div key={sub} className="year-item" onClick={()=>selectSubject(sub)}>
+                <FontAwesomeIcon icon={faBook}/>
                 <p>{sub}</p>
               </div>
             ))}
@@ -202,72 +378,47 @@ const Home = () => {
         </section>
       )}
 
-      {/* Units Section */}
       {section === "units" && (
         <section>
-          <button className="back-btn" onClick={() => setSection("subjects")}>
-            Back to Subjects
-          </button>
+          <button className="back-btn" onClick={()=>setSection("subjects")}>Back to Subjects</button>
           <h2>{selectedSubject} - Units</h2>
           <div className="unit-list">
-            {[1, 2, 3, 4, 5].map((u) => (
-              <div key={u} className="year-item" onClick={() => selectUnit(`Unit ${u}`)}>
-                <FontAwesomeIcon icon={faBookOpen} />
-                <p>Unit {u}</p>
+            {getUnits().map(unit=>(
+              <div key={unit} className="year-item" onClick={()=>selectUnit(unit)}>
+                <FontAwesomeIcon icon={faBookOpen}/>
+                <p>{unit}</p>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* PDFs Section */}
       {section === "pdfs" && (
         <section>
-          <button className="back-btn" onClick={() => setSection("units")}>
-            Back to Units
-          </button>
+          <button className="back-btn" onClick={()=>setSection("units")}>Back to Units</button>
           <h2>{selectedUnit} - PDFs</h2>
-          <form id="pdf-upload-form" onSubmit={handlePDFUpload} className="upload-form">
-            <input type="file" id="pdf-file" accept=".pdf" required />
+          <form onSubmit={handlePDFUpload} className="upload-form">
+            <input type="file" id="pdf-file" accept=".pdf" required/>
             <button type="submit">Upload</button>
           </form>
           <div className="pdf-list">
-            {(pdfStorage[`${selectedYear}-${selectedSubject}-${selectedUnit}`] || []).map(
-              (file, i) => (
-                <div key={i} className="pdf-item">
-                  <FontAwesomeIcon icon={faFilePdf} />
-                  <span>{file}</span>
-                </div>
-              )
-            )}
+            {(pdfStorage[`${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`]||[]).map((file,i)=>(
+              <div key={i} className="pdf-item"><FontAwesomeIcon icon={faFilePdf}/><span>{file}</span></div>
+            ))}
           </div>
         </section>
       )}
 
-      {/* About Section */}
       {section === "about" && (
-        <section>
-          <h2>About Us</h2>
-          <p>
-            Welcome to UniNotes! Our platform allows students to upload and share notes easily across
-            various departments and academic years.
-          </p>
-        </section>
+        <section><h2>About Us</h2><p>Welcome to UniNotes! Share notes across departments and years.</p></section>
       )}
-
-      {/* Contact Section */}
       {section === "contact" && (
         <section>
           <h2>Contact Us</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Message sent!");
-            }}
-          >
-            <input type="text" placeholder="Your Name" required />
-            <input type="email" placeholder="Your Email" required />
-            <textarea rows="5" placeholder="Your Message" required></textarea>
+          <form onSubmit={e=>{e.preventDefault();alert("Message sent!")}}>
+            <input type="text" placeholder="Your Name" required/>
+            <input type="email" placeholder="Your Email" required/>
+            <textarea rows="5" placeholder="Your Message" required/>
             <button type="submit">Send</button>
           </form>
         </section>
@@ -277,3 +428,4 @@ const Home = () => {
 };
 
 export default Home;
+
