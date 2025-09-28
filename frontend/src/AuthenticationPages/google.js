@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 
 export default function GoogleLoginPage() {
 
+
   const navigate = useNavigate();
 
 
@@ -31,6 +32,7 @@ export default function GoogleLoginPage() {
     }
   }
 
+
   //handling the logout option if any
   function handlelogout() {
     googleLogout();
@@ -46,7 +48,7 @@ export default function GoogleLoginPage() {
       <Toaster />
       <div style={{
         transform: 'scale(1.5)',
-        background: '#b2e0f5',
+        background: '#58761b',
         transformOrigin: '0 0',
         display: 'flex',
         height: '66.7vh',

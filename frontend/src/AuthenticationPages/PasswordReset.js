@@ -1,41 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PasswordReset.css'; // Import the CSS file
 import { TextField } from '@mui/material';
 import { toast, Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 export default function ResetPasswordPage() {
-
   const [email, setEmail] = useState('');
+  const [animate, setAnimate] = useState(false);
 
   const navigate = useNavigate();
 
- async function handleEmailForPasswordReset(email) {
-  if (!email) {
-    toast.error('No registered email entered.', { duration: 3000 });
-    return;
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
-  try {
-    const response = await fetch('http://localhost:5001/otp/check-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.exists) {
-      toast.success('Email is registered! Verify the OTP to reset password.', { duration: 4000 });
-      navigate('/PasswordOtp', { state: { email } });
-    } else {
-      toast.error('Email is not registered.', { duration: 3000 });
+  async function handleEmailForPasswordReset(email) {
+    if (!email) {
+      toast.error('No registered email entered.', { duration: 3000 });
+      return;
     }
-  } catch (error) {
-    toast.error('Error checking email. Please try again.', { duration: 3000 });
-  }
-}
+    try {
+      const response = await fetch('http://localhost:5001/otp/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
+      const data = await response.json();
+
+      if (response.ok && data.exists) {
+        toast.success('Email is registered! Verify the OTP to reset password.', { duration: 4000 });
+        navigate('/PasswordOtp', { state: { email } });
+      } else {
+        toast.error('Email is not registered.', { duration: 3000 });
+      }
+    } catch (error) {
+      toast.error('Error checking email. Please try again.', { duration: 3000 });
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,13 +47,24 @@ export default function ResetPasswordPage() {
     } else {
       toast.error('Please enter your registered email.', { duration: 3000 });
     }
-  };
+  }
 
   return (
     <>
       <Toaster />
-      <div className="wrapperPasswordReset">
-        <div className="leftPanelPasswordReset">
+      <div
+        className={`wrapperPasswordReset`}
+        style={{
+          backgroundSize: 'cover',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* circles */}
+        <div className={`circleBG leftCirclePasswordReset ${animate ? 'circleIn' : ''}`}></div>
+        <div className={`circleBG rightCirclePasswordReset ${animate ? 'circleIn' : ''}`}></div>
+        {/* Panels */}
+        <div className={`leftPanelPasswordReset ${animate ? 'fadeSlideIn' : ''}`}>
           <img
             className="illustrationPasswordReset"
             src="/PasswordResetIllustration.jpg"
@@ -58,7 +72,8 @@ export default function ResetPasswordPage() {
           />
           <div className="leftTextPasswordReset"><strong>Reset Your Password</strong></div>
         </div>
-        <div className="rightPanelPasswordReset">
+
+        <div className={`rightPanelPasswordReset ${animate ? 'fadeSlideIn' : ''}`}>
           <div className="headingPasswordReset">Reset Password</div>
           <div className="underlinePasswordReset"></div>
           <form onSubmit={handleSubmit}>

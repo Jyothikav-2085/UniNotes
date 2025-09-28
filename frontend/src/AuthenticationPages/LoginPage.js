@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 // Material UI imports
-import { FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
+import { FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, TextField } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import TextField from '@mui/material/TextField';
-
 
 const socialIcons = [{ label: <strong>G</strong> }];
 
-
 export default function LoginPage() {
-
   const navigate = useNavigate();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClickShowPassword = () => {
     setShowLoginPassword((show) => !show);
@@ -52,16 +54,27 @@ export default function LoginPage() {
     }
   };
 
-  //jsx component
   return (
     <>
       <Toaster />
-      <div className="wrapperLogin">
-        <div className="leftPanelLogin">
-          <img className="illustrationLogin" src="/LogInIllustration.png" alt="LogIn Illustration" />
+      <div
+        className={`wrapperLogin`}
+        style={{
+          backgroundSize: 'cover',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Animated Circles */}
+        <div className={`circleBG leftCircleLogin ${animate ? 'circleIn' : ''}`}></div>
+        <div className={`circleBG rightCircleLogin ${animate ? 'circleIn' : ''}`}></div>
+
+        {/* Animated Panels */}
+        <div className={`leftPanelLogin ${animate ? 'fadeSlideIn' : ''}`}>
+          <img className="illustrationLogin" src="/LogInIllustration.jpg" alt="LogIn Illustration" />
           <div className="leftTextLogin"><strong>Login to your account</strong></div>
         </div>
-        <div className="rightPanelLogin">
+        <div className={`rightPanelLogin ${animate ? 'fadeSlideIn' : ''}`}>
           <div className="headingLogin">Log In</div>
           <div className="underlineLogin"></div>
 
@@ -80,29 +93,24 @@ export default function LoginPage() {
                 width: '103.5%',
                 backgroundColor: 'white',
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#0b8806ff',
+                  color: '#d99201',
                 },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '6px',
                 },
                 '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#0b8806ff',
+                  borderColor: '#d99201',
                 },
               }}
             />
 
-
-
-            {/* Updated password input with Material UI component */}
-            <FormControl sx={{ width: '103.5%', marginBottom: '17px', }} variant="outlined">
+            <FormControl sx={{ width: '103.5%', marginBottom: '17px' }} variant="outlined">
               <InputLabel
                 htmlFor="outlined-adornment-password"
-                sx={{
-                  '&.Mui-focused': {
-                    color: '#0b8806ff',
-                  },
-                }}
-              > Password</InputLabel>
+                sx={{ '&.Mui-focused': { color: '#d99201' } }}
+              >
+                Password
+              </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password"
                 type={showLoginPassword ? 'text' : 'password'}
@@ -124,17 +132,17 @@ export default function LoginPage() {
                 label="Password"
                 required
                 sx={{
-                  backgroundColor: 'white', '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#0b8806ff',
-                  }
+                  backgroundColor: 'white',
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#d99201',
+                  },
                 }}
               />
             </FormControl>
 
-
-
             <button className="buttonLogin" type="submit">Log In</button>
           </form>
+
           <div className="orLoginSignUp" style={{ marginBottom: '-10px' }}>Or login with</div>
           <div
             className="socialRowLogin"
@@ -151,8 +159,6 @@ export default function LoginPage() {
             ))}
           </div>
 
-
-
           <button
             type="button"
             className="forgotLinkLogin"
@@ -161,14 +167,10 @@ export default function LoginPage() {
             Forgot password?
           </button>
 
-
-
           <div className="signupRedirectLogin">
             Don't have an account?
             <span className="signupLinkLogin" onClick={() => navigate('/signup')}>SignUp Here</span>
           </div>
-
-
         </div>
       </div>
     </>

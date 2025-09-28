@@ -1,5 +1,5 @@
 .background {
-  background-image: "/UniNotesAuth.png"; /* Use your background pattern image */
+  background-image: "/UniNotesAuth.png"; 
   background-repeat: repeat;
   min-height: 100vh;
   display: flex;

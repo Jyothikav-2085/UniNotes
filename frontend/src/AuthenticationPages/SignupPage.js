@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import './SignUpPage.css';
@@ -7,16 +7,30 @@ import { FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Tex
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+
+
+
 const socialIcons = [{ label: <strong>G</strong> }];
+
+
 
 export default function SignupPage() {
 
+
   const navigate = useNavigate();
+
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -42,8 +56,7 @@ export default function SignupPage() {
       if (res.ok) {
         toast.success('Signup successful! Please verify your email.', { position: 'top-center', duration: 3000 });
         navigate('/EmailOtp', { state: { email } });
-      }
-      else {
+      } else {
         const data = await res.json();
         toast.error('Signup failed: ' + (data.error || data.message), { position: 'top-center', duration: 3000 });
       }
@@ -53,22 +66,27 @@ export default function SignupPage() {
   };
 
 
-  //jsx components
+
+
+
   return (
     <>
       <Toaster />
-      <div className="wrapperSignUp">
-        <div className="leftPanelSignUp">
-          <img className="illustrationSignUp" src="/SignupIllustration.png" alt="Signup Illustration" />
+      <div className={`wrapperSignUp`}>
+        {/* Circles */}
+        <div className={`circleBG leftCircleSignUp ${animate ? 'circleIn' : ''}`}></div>
+        <div className={`circleBG rightCircleSignUp ${animate ? 'circleIn' : ''}`}></div>
+
+        {/* Panels */}
+        <div className={`leftPanelSignUp ${animate ? 'fadeSlideIn' : ''}`}>
+          <img className="illustrationSignUp" src="/SignupIllustration.jpg" alt="Signup Illustration" />
           <div className="leftTextSignUp"><strong>Create an account</strong></div>
         </div>
-        <div className="rightPanelSignUp">
+        <div className={`rightPanelSignUp ${animate ? 'fadeSlideIn' : ''}`}>
           <div className="headingSignUp">Sign Up</div>
           <div className="underlineSignUp"></div>
 
           <form onSubmit={handleSubmit}>
-
-            {/* Full name as MUI TextField */}
             <TextField
               label="Full name"
               variant="outlined"
@@ -79,22 +97,21 @@ export default function SignupPage() {
               slotProps={{
                 input: {
                   minLength: 3,
-                  maxLength: 100
-                }
+                  maxLength: 100,
+                },
               }}
               sx={{
                 backgroundColor: 'white',
                 marginBottom: '17px',
                 width: '103.5%',
-                '& .MuiInputLabel-root.Mui-focused': { color: '#1667EB' },
+                '& .MuiInputLabel-root.Mui-focused': { color: '#d99201' },
                 '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1667EB',
+                  borderColor: '#d99201',
                 },
                 borderRadius: '6px',
               }}
             />
 
-            {/* Email as MUI TextField */}
             <TextField
               label="Email"
               variant="outlined"
@@ -106,19 +123,18 @@ export default function SignupPage() {
                 backgroundColor: 'white',
                 marginBottom: '17px',
                 width: '103.5%',
-                '& .MuiInputLabel-root.Mui-focused': { color: '#1667EB' },
+                '& .MuiInputLabel-root.Mui-focused': { color: '#d99201' },
                 '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1667EB',
+                  borderColor: '#d99201',
                 },
                 borderRadius: '6px',
               }}
             />
 
-            {/* Password as before */}
             <FormControl sx={{ width: '103.5%', marginBottom: '17px' }} variant="outlined">
               <InputLabel
                 htmlFor="outlined-adornment-password"
-                sx={{ '&.Mui-focused': { color: '#1667EB' } }}
+                sx={{ '&.Mui-focused': { color: '#d99201' } }}
               >
                 Password
               </InputLabel>
@@ -143,9 +159,10 @@ export default function SignupPage() {
                 label="Password"
                 required
                 sx={{
-                  backgroundColor: 'white', '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#1667EB',
-                  }
+                  backgroundColor: 'white',
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#d99201',
+                  },
                 }}
               />
             </FormControl>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './EmailOtp.css';
@@ -13,8 +13,13 @@ export default function EmailOtp() {
 
   const [timer, setTimer] = useState(0);
   const [sending, setSending] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
-  // otp allowing only numbers
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleChange = (e, index) => {
     const val = e.target.value;
     if (/^[0-9]$/.test(val) || val === '') {
@@ -27,14 +32,12 @@ export default function EmailOtp() {
     }
   };
 
-  //No spaces are allowed in otp
   const handleKeyDown = (e, index) => {
     if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
-  // sending otp to the email with improved error handling
   const handleSendOtp = async () => {
     if (!userEmail) {
       toast.error('No email available to send OTP', { position: 'top-center', duration: 3000 });
@@ -62,7 +65,6 @@ export default function EmailOtp() {
           });
         }, 1000);
       } else {
-        // Read error response more carefully
         const data = await res.json().catch(() => ({}));
         const errorMsg = data.error || `Failed to send OTP (status ${res.status})`;
         if (res.status === 429 && data.error === 'Exceeded OTP limit') {
@@ -78,7 +80,6 @@ export default function EmailOtp() {
     }
   };
 
-  // verification of otp or finding errors in the submission of otp
   const handleSubmit = async (e) => {
     e.preventDefault();
     const otp = inputRefs.current.map(input => input.value).join('');
@@ -112,8 +113,12 @@ export default function EmailOtp() {
   return (
     <>
       <Toaster />
-      <div className="wrapper">
-        <div className="leftPanel">
+      <div className="wrapper" style={{ backgroundSize: 'cover', position: 'relative', overflow: 'hidden' }}>
+        {/* Circles */}
+        <div className={`circleBG leftCircle ${animate ? 'circleIn' : ''}`}></div>
+        <div className={`circleBG rightCircle ${animate ? 'circleIn' : ''}`}></div>
+        {/* Panels */}
+        <div className={`leftPanel ${animate ? 'fadeSlideIn' : ''}`}>
           <img
             className="illustration"
             src="/OtpVerificationIllustration.png"
@@ -128,9 +133,11 @@ export default function EmailOtp() {
             {timer > 0 ? `Resend OTP in ${timer}s` : 'Send OTP'}
           </button>
         </div>
-        <div className="rightPanel">
+
+        <div className={`rightPanel ${animate ? 'fadeSlideIn' : ''}`}>
           <div className="heading">Email OTP Verification</div>
           <div className="underline"></div>
+
           <form onSubmit={handleSubmit}>
             <div className="otpContainer">
               {[...Array(6)].map((_, idx) => (
@@ -150,6 +157,7 @@ export default function EmailOtp() {
             </div>
             <button type="submit" className="button">Verify OTP</button>
           </form>
+
           <div className="infoText">
             <span
               onClick={timer > 0 ? undefined : handleSendOtp}

@@ -1,4 +1,6 @@
 .wrapperLogin {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   width: 100vw;
   display: flex;
@@ -8,6 +10,78 @@
   font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
+/* Circle background containers */
+.circleBG {
+  position: absolute;
+  z-index: 1;
+  width: 600px;
+  height: 600px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition:
+    transform 1.15s cubic-bezier(.17,1.14,.66,1.1),
+    opacity 0.65s cubic-bezier(.14,.68,.55,1.01);
+}
+
+/* Left concentric circles */
+.leftCircleLogin {
+  left: 1075px;
+  bottom: -300px;
+  width: 600px;
+  height: 600px;
+  background:
+    radial-gradient(circle, #2e4307 0 70px, transparent 70px),
+    radial-gradient(circle, #58761b 0 130px, transparent 130px),
+    radial-gradient(circle, #8caf3b 0 190px, transparent 190px),
+    radial-gradient(circle, #bed868 0 250px, transparent 250px),
+    radial-gradient(circle, #e0f19a 0 300px, transparent 300px);
+  transform: translateX(160px);
+}
+
+/* Right concentric circles */
+.rightCircleLogin {
+  right: 1075px;
+  top: -300px;
+  width: 600px;
+  height: 600px;
+  background:
+    radial-gradient(circle, #7a5600 0 70px, transparent 70px),
+    radial-gradient(circle, #d99201 0 130px, transparent 130px),
+    radial-gradient(circle, #e2b72b 0 190px, transparent 190px),
+    radial-gradient(circle, #f4d360 0 250px, transparent 250px),
+    radial-gradient(circle, #fae694 0 300px, transparent 300px);
+  transform: translateX(-160px);
+}
+
+/* Animate circles sliding in */
+.circleIn.leftCircleLogin {
+  transform: translateX(0);
+  opacity: 0.95;
+}
+.circleIn.rightCircleLogin {
+  transform: translateX(0);
+  opacity: 0.95;
+  
+}
+
+/* Panels: position and layering */
+.leftPanelLogin,
+.rightPanelLogin {
+  position: relative;
+  z-index: 2;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Shadow and subtle scale on panel hover */
+.leftPanelLogin:hover,
+.rightPanelLogin:hover {
+  box-shadow:
+    0 8px 32px rgba(88, 118, 27, 0.6),
+    0 4px 20px rgba(217, 146, 1, 0.45);
+  transform: scale(1.02);
+}
+
+/* Left Panel Styles */
 .leftPanelLogin {
   background: #ffffffff;
   width: 340px;
@@ -21,20 +95,23 @@
   min-height: 405px;
 }
 
+/* Illustration image */
 .illustrationLogin {
   width: 340px;
   margin-bottom: 18px;
 }
 
+/* Left panel text */
 .leftTextLogin {
   font-size: 1.3rem;
-  color: #000000ff;
+  color: #58761b;
   margin-top: 0px;
   cursor: default;
 }
 
+/* Right Panel Styles */
 .rightPanelLogin {
-  background: #b2f5b2ff;
+  background: #58761b;
   width: 425px;
   border-radius: 0 18px 18px 0;
   box-shadow: 0 2px 18px rgba(0, 0, 0, 0.07);
@@ -43,8 +120,10 @@
   justify-content: center;
   padding: 42px 38px;
   min-height: 300px;
+  cursor: default;
 }
 
+/* Heading */
 .headingLogin {
   font-size: 3rem;
   font-weight: 700;
@@ -54,15 +133,17 @@
   color: #ffffffff;
 }
 
+/* Underline */
 .underlineLogin {
   width: 150px;
   height: 3px;
   align-items: center;
-  background: #0b8806ff;
+  background: #d99201;
   margin-bottom: 26px;
   border-radius: 2px;
 }
 
+/* Input styling */
 .inputLogin {
   width: 100%;
   padding: 13px 14px;
@@ -75,8 +156,9 @@
   transition: border 0.2s;
 }
 
+/* Button styling */
 .buttonLogin {
-  background: #0b8806ff;
+  background: #d99201;
   color: #fff;
   font-weight: 600;
   font-size: 1.3rem;
@@ -91,13 +173,14 @@
 }
 
 .buttonLogin:hover {
-  background-color: #0a7a05ff;
+  background-color: #d99201;
   transform: scale(1.05);
 }
 
+/* Forgot password link */
 .forgotLinkLogin {
-  color: #0b8806ff;
-  font-size: 0.98rem;
+  color: #d99201;
+  font-size: 1rem;
   text-decoration: underline;
   margin: 10px 0 0 0;
   align-self: center;
@@ -109,21 +192,25 @@
   font: inherit;
 }
 
+/* Signup redirect styling */
 .signupRedirectLogin {
   margin-top: 20px;
+  color: #fff;
   cursor: default;
   font-size: 1rem;
   text-align: center;
 }
 
+/* Signup link styling */
 .signupLinkLogin {
-  color: #0b8806ff;
+  color: #d99201;
   cursor: pointer;
   font-weight: 600;
   text-decoration: underline;
   margin-left: 6px;
 }
 
+/* Social icons styling */
 .socialIconLogin {
   width: 35px;
   height: 35px;
@@ -133,7 +220,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  color: #0b8806ff;
+  color: #d99201;
   cursor: pointer;
   border: none;
   margin-bottom: 10px;
@@ -141,7 +228,7 @@
 }
 
 .socialIconLogin:hover {
-  background: #0b8806ff;
+  background: #d99201;
   color: #ffffff;
   transform: scale(1.1);
 }

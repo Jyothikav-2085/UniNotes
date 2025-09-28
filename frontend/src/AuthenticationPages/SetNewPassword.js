@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SetNewPassword.css'; // Import the CSS file
 import { FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
 import { toast, Toaster } from 'react-hot-toast';
@@ -9,9 +9,7 @@ import Visibility2 from '@mui/icons-material/Visibility';
 import VisibilityOff2 from '@mui/icons-material/VisibilityOff';
 
 export default function ResetPasswordPage() {
-
   const location = useLocation();
-
   const userEmail = location.state?.email || '';
 
   const [password, setPassword] = useState('');
@@ -20,6 +18,12 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -28,7 +32,6 @@ export default function ResetPasswordPage() {
   const handleClickShowConfirmPassword = () => {
     setShowConfirmPassword((show) => !show);
   };
-
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -40,6 +43,7 @@ export default function ResetPasswordPage() {
 
   const navigate = useNavigate();
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -73,10 +77,7 @@ export default function ResetPasswordPage() {
 
       if (response.ok && data.success) {
         toast.success('Password updated successfully!', { duration: 3000 });
-        // Optionally navigate to login or home page after password reset
-       
-          navigate('/login'); // Change path as needed
-       
+        navigate('/login'); // Change path as needed
       } else {
         toast.error('Failed to update password: ' + (data.error || 'Unknown error'), { duration: 3000 });
       }
@@ -86,20 +87,24 @@ export default function ResetPasswordPage() {
   };
 
 
-  //jsx components
+
   return (
     <>
       <Toaster />
-      <div className="wrapperNewPassword">
-        <div className="leftPanelNewPassword">
+      <div className={`wrapperNewPassword`}>
+        {/* Circles */}
+        <div className={`circleBG leftCircleNewPassword ${animate ? 'circleIn' : ''}`}></div>
+        <div className={`circleBG rightCircleNewPassword ${animate ? 'circleIn' : ''}`}></div>
+        {/* Panels */}
+        <div className={`leftPanelNewPassword ${animate ? 'fadeSlideIn' : ''}`}>
           <img
             className="illustrationNewPassword"
-            src="/PasswordResetIllustration.jpg"
+            src="/SetNewPasswordIllustration.png"
             alt="Reset Password Illustration"
           />
           <div className="leftTextNewPassword"><strong>Set your new password</strong></div>
         </div>
-        <div className="rightPanelNewPassword">
+        <div className={`rightPanelNewPassword ${animate ? 'fadeSlideIn' : ''}`}>
           <div className="headingNewPassword">Set a New Password</div>
           <div className="underlineNewPassword"></div>
           <form onSubmit={handleSubmit}>
@@ -174,8 +179,6 @@ export default function ResetPasswordPage() {
                 }}
               />
             </FormControl>
-
-
 
             <button type="submit" className="buttonNewPassword">
               Submit

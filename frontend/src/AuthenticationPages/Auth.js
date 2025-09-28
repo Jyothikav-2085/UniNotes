@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Auth.css'; // See CSS below
+import './Auth.css';
 
 const UniNotes = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const UniNotes = () => {
     <div className="background">
       <div className="container">
         <img
-          src="/UniNotesLogoReact.jpg" // Replace with your logo/icon path
+          src="/UniNotesLogoReact.jpg"
           alt="UniNotes Logo"
           className="logo"
         />
