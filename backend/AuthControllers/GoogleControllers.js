@@ -23,7 +23,7 @@ export const googleController = async (req, res, supabase) => {
       return res.status(500).json({ error: 'Login DB error', details: loginError });
     }
 
-    return res.status(201).json({ message: 'Google user saved to both tables' });
+    return res.status(201).json({ message: 'Google user saved to both tables', google_id: google_id });
   } catch (err) {
     return res.status(500).json({ error: 'Unexpected error', details: err.message });
   }

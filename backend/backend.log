@@ -1,0 +1,63 @@
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Error connecting to Supabase: {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'    at node:internal/deps/undici/undici:13510:13\n'[39m +
+    [32m'    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n'[39m +
+    [32m'    at async checkSupabaseConnection (file:///C:/Users/jyoth/OneDrive/Desktop/UniNotes(F)/UniNotes/backend/server.js:58:29)\n'[39m +
+    [32m'    at async file:///C:/Users/jyoth/OneDrive/Desktop/UniNotes(F)/UniNotes/backend/server.js:82:5'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!
+Server running on port 5001
+Connected to Supabase database successfully!

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,6 +20,14 @@ import {
   faBookOpen,
   faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
+import { createClient } from '@supabase/supabase-js'; // For Supabase client initialization (even if not for auth)
+
+// Initialize Supabase client for frontend (removed)
+// const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+// const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+// console.log('Frontend Supabase URL:', supabaseUrl);
+// console.log('Frontend Supabase Key (first 5 chars):', supabaseKey ? supabaseKey.substring(0, 5) : 'N/A');
+const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY);
 
 const Home = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -28,6 +37,8 @@ const Home = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedUnit, setSelectedUnit] = useState("");
   const [pdfStorage, setPdfStorage] = useState({});
+  const [noteTitle, setNoteTitle] = useState(""); // New state for note title
+  const [userNotes, setUserNotes] = useState([]); // New state for user-specific notes
   const isPopState = useRef(false);
 
   // Subjects and Units organized by department -> semester -> subjects -> units
@@ -261,6 +272,43 @@ const Home = () => {
     }
   };
 
+  // Fetch user-specific notes from Supabase storage
+  useEffect(() => {
+    const fetchUserNotes = async () => {
+      const userId = localStorage.getItem('loggedInUserId');
+      if (!userId) {
+        setUserNotes([]);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.storage.from('notes-pdfs').list(''); // Fetch all files
+
+        if (error) {
+          console.error('Error fetching user notes from Supabase:', error);
+          return;
+        }
+
+        const notes = data.map(item => {
+          const filename = item.name;
+          // No longer expect user_id prefix in filename, directly use the filename as display title
+          const displayTitle = filename.substring(0, filename.lastIndexOf('.')).replace(/_/g, ' '); // Extract and sanitize title
+
+          const publicUrl = supabase.storage.from('notes-pdfs').getPublicUrl(filename).data.publicUrl;
+          return { name: displayTitle, url: publicUrl };
+        });
+
+        // Filter notes by user ID in the frontend (no longer needed as per latest instruction for displaying all notes)
+        // const filteredNotes = notes.filter(note => note.url.includes(`/${userId}_`));
+        setUserNotes(notes); // Display all notes
+      } catch (error) {
+        console.error('Unexpected error fetching user notes:', error);
+      }
+    };
+
+    fetchUserNotes();
+  }, [selectedDep, selectedYear, selectedSubject, selectedUnit, localStorage.getItem('loggedInUserId')]); // Added localStorage.getItem('loggedInUserId') as a dependency
+
   // Push and popstate handlers
   useEffect(() => {
     if (!isPopState.current) {
@@ -291,16 +339,55 @@ const Home = () => {
   const selectSubject = (sub) => { setSelectedSubject(sub); setSection("units"); };
   const selectUnit = (unit) => { setSelectedUnit(unit); setSection("pdfs"); };
 
-  const handlePDFUpload = (e) => {
+  const handlePDFUpload = async (e) => {
     e.preventDefault();
     const file = e.target.elements["pdf-file"].files[0];
-    if (!file) return;
-    const key = `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`;
-    setPdfStorage(prev => ({
-      ...prev,
-      [key]: [...(prev[key] || []), file.name],
-    }));
-    e.target.reset();
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    if (!noteTitle.trim()) {
+      alert("Please enter a title for your note.");
+      return;
+    }
+
+    const userId = localStorage.getItem('loggedInUserId'); // Get userId from localStorage
+
+    if (!userId) {
+      alert("You must be logged in to upload notes.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("note", file); // 'note' is the field name expected by Multer in the backend
+    formData.append("user_id", userId);
+    // formData.append("title_subject", `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`); // Removed
+    formData.append("title", noteTitle.trim()); // New: Send the user-provided title
+
+    try {
+      const response = await fetch("http://localhost:5001/notes/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+        // Update local state if upload is successful
+        const key = `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`;
+        setPdfStorage(prev => ({
+          ...prev,
+          [key]: [...(prev[key] || []), file.name],
+        }));
+        e.target.reset();
+      } else {
+        alert(`Upload failed: ${data.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      alert(`An error occurred during upload: ${error.message}`);
+    }
   };
 
   const getSubjects = () => departmentData[selectedDep]?.[selectedYear] || {};
@@ -398,13 +485,33 @@ const Home = () => {
           <button className="back-btn" onClick={()=>setSection("units")}>Back to Units</button>
           <h2>{selectedUnit} - PDFs</h2>
           <form onSubmit={handlePDFUpload} className="upload-form">
+            <input
+              type="text"
+              placeholder="Enter Note Title"
+              value={noteTitle}
+              onChange={(e) => setNoteTitle(e.target.value)}
+              required
+              className="note-title-input"
+            />
             <input type="file" id="pdf-file" accept=".pdf" required/>
             <button type="submit">Upload</button>
           </form>
           <div className="pdf-list">
-            {(pdfStorage[`${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`]||[]).map((file,i)=>(
-              <div key={i} className="pdf-item"><FontAwesomeIcon icon={faFilePdf}/><span>{file}</span></div>
-            ))}
+            <h3>Your Uploaded Notes:</h3>
+            {userNotes.length > 0 ? (
+              userNotes.map((note, index) => (
+                <div key={index} className="pdf-item">
+                  <FontAwesomeIcon icon={faFilePdf}/>
+                  <span>{note.name}</span>
+                  <a href={note.url} target="_blank" rel="noopener noreferrer" download={note.name + '.pdf'}>
+                    <button className="download-btn">Download</button>
+                  </a>
+                  {console.log('Download URL for', note.name, ':', note.url)} {/* Added console.log for URL */}
+                </div>
+              ))
+            ) : (
+              <p>No notes uploaded yet for this user.</p>
+            )}
           </div>
         </section>
       )}

@@ -3,6 +3,17 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import supabase from './db.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Console } from 'console'; // Import Console directly for ES Modules
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const logFile = path.resolve(__dirname, 'backend.log');
+const output = fs.createWriteStream(logFile, { flags: 'a' });
+const errorOutput = fs.createWriteStream(logFile, { flags: 'a' });
+const console = new Console(output, errorOutput); // Use the imported Console
 
 import createSignUpTable from './AuthDBSchema/SignUpDB.js'; // Import the function to create the SignUp table
 import { signupController } from './AuthControllers/SignUpControllers.js'; // Import the signup controller
@@ -13,6 +24,7 @@ import { loginController } from './AuthControllers/LogInControllers.js'; // Impo
 import createEmailOtpTable from './AuthDBSchema/EmailOtpDB.js'; // Import the function to create the Email OTP table
 import createResetPasswordOtpTable from './AuthDBSchema/ResetPasswordOtpDB.js'; // Import the function to create the password reset otp table
 import otpRoutes from './Routes/OtpRoutes.js'; // Import OTP routes
+import notesRoutes from './Routes/NotesRoutes.js'; // Import Notes routes
 
 import { googleController } from './AuthControllers/GoogleControllers.js'; // Import the Google controller
 
@@ -34,6 +46,7 @@ app.post('/login', (req, res) => {
 });
 
 app.use('/otp', otpRoutes);
+app.use('/notes', notesRoutes);
 
 app.post('/google', (req, res) => {
   googleController(req, res, supabase);
@@ -61,7 +74,7 @@ const checkSupabaseConnection = async () => {
     await createEmailOtpTable();
     await createResetPasswordOtpTable();
 
-    const PORT = process.env.PORT || 5001;
+    const PORT = process.env.BACKEND_PORT || 5001;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

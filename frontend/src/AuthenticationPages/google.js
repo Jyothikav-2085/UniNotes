@@ -26,6 +26,12 @@ export default function GoogleLoginPage() {
       }
       const data = await response.json();
       console.log('Backend response:', data);
+      
+      // Store google_id in localStorage
+      if (data.google_id) {
+        localStorage.setItem('loggedInUserId', data.google_id);
+        console.log('Stored user ID in localStorage:', data.google_id);
+      }
     } catch (e) {
       console.error('Failed to save user to backend:', e);
       toast.error('Failed to save user info', { position: 'top-center', duration: 3000 });
