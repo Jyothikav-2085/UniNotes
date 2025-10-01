@@ -10,26 +10,31 @@ const UniNotes = () => {
   };
 
   return (
-    <div className="background">
-      <div className="container">
-        <img
-          src="/UniNotesLogoReact.jpg"
-          alt="UniNotes Logo"
-          className="logo"
-        />
-        <h1>
-          <span className="uni">Uni</span>
-          <span className="notes">Notes</span>
-        </h1>
-        <p className="subtitle">
+    <div className="backgroundAuth mobile-background">
+      <div className="containerAuth mobile-container">
+        <div className="logo-block">
+          <img
+            src="/UniNotesLogoReact.jpg"
+            alt="UniNotes Logo"
+            className="logoAuth mobile-logo"
+          />
+        </div>
+        <div className="title-block">
+          <h1 className="mobile-title">
+            <span className="uniAuth">Uni</span>
+            <span className="notesAuth">Notes</span>
+          </h1>
+        </div>
+        <p className="subtitleAuth mobile-subtitle">
           Your One-Stop Solution<br />
           For All Your Academics Need!
         </p>
-        <button className="login-btn" onClick={handleLoginClick}>
+        <button className="login-btnAuth mobile-login-btn" onClick={handleLoginClick}>
           Log In
         </button>
-        <p className="signup-text">
-          Don’t have an account? <a href="/signup" className="signup-link">SignUp Here</a>
+        <p className="signup-textAuth mobile-signup-text">
+          Don’t have an account?{' '}
+          <a href="/signup" className="signup-linkAuth">SignUp Here</a>
         </p>
       </div>
     </div>
@@ -37,3 +42,4 @@ const UniNotes = () => {
 };
 
 export default UniNotes;
+

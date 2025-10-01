@@ -98,7 +98,15 @@ export default function EmailOtp() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        toast.success('OTP verified successfully!', { position: 'top-center', duration: 3000 });
+  const { userId, userName } = data;   // Extract userId and userName from response data
+  console.log('Storing to localStorage:', userId, userName);
+
+  if (userId && userName) {
+    localStorage.setItem('loggedInUserId', userId);
+    localStorage.setItem('loggedInUserName', userName);
+  } else {
+    console.warn("User info not found in OTP verify response.");
+  }
         setTimeout(() => {
           navigate('/home', { state: { message: 'OTP verified successfully!' } });
         }, 2500);

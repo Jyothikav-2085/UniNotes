@@ -1,13 +1,12 @@
 import { GoogleLogin, googleLogout } from "@react-oauth/google";
 import { toast, Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+
 
 export default function GoogleLoginPage() {
 
-
   const navigate = useNavigate();
-
 
   async function saveGoogleUserToBackend(user) {
     try {
@@ -26,18 +25,23 @@ export default function GoogleLoginPage() {
       }
       const data = await response.json();
       console.log('Backend response:', data);
-      
-      // Store google_id in localStorage
-      if (data.google_id) {
+
+      // Store google_id and user name in localStorage
+      if (data.google_id && data.name) {
         localStorage.setItem('loggedInUserId', data.google_id);
-        console.log('Stored user ID in localStorage:', data.google_id);
+        localStorage.setItem('loggedInUserName', data.name);
+        console.log('Stored user ID and name in localStorage:', data.google_id, data.name);
+      } else {
+        // As fallback, use data from Google JWT decoded user if backend does not return full info
+        localStorage.setItem('loggedInUserId', user.sub);
+        localStorage.setItem('loggedInUserName', user.name);
+        console.log('Stored user ID and name from Google JWT:', user.sub, user.name);
       }
     } catch (e) {
       console.error('Failed to save user to backend:', e);
       toast.error('Failed to save user info', { position: 'top-center', duration: 3000 });
     }
   }
-
 
   //handling the logout option if any
   function handlelogout() {
@@ -46,7 +50,6 @@ export default function GoogleLoginPage() {
     toast.success('Logout Successful', { position: 'top-center', duration: 3000 });
     setTimeout(() => navigate('/'), 2500);
   }
-
 
   //jsx components
   return (

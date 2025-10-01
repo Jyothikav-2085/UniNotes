@@ -1,4 +1,4 @@
-.background {
+.backgroundAuth {
   background-image: "/UniNotesAuth.png"; 
   background-repeat: repeat;
   min-height: 100vh;
@@ -7,7 +7,7 @@
   justify-content: center;
 }
 
-.container {
+.containerAuth {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 3px 16px rgba(0,0,0,0.1);
@@ -17,7 +17,7 @@
   width: 100%;
 }
 
-.logo {
+.logoAuth {
   width: 140px;
   margin-bottom: 24px;
 }
@@ -28,22 +28,22 @@ h1 {
   margin-bottom: 8px;
 }
 
-.uni {
+.uniAuth {
   color: #D6336C;
 }
 
-.notes {
+.notesAuth {
   color: #2563EB;
 }
 
-.subtitle {
+.subtitleAuth {
   font-size: 1.3rem;
   margin-bottom: 32px;
   color: #212121;
   font-weight: 500;
 }
 
-.login-btn {
+.login-btnAuth {
   background: #FFD60A;
   color: #212121;
   font-size: 1.25rem;
@@ -56,22 +56,91 @@ h1 {
   transition: background 0.2s;
 }
 
-.login-btn:hover {
+.login-btnAuth:hover {
   background: #eac008;
 }
 
-.signup-text {
+.signup-textAuth {
   font-size: 1rem;
   margin-top: 12px;
 }
 
-.signup-link {
+.signup-linkAuth {
   color: #FFD60A;
   font-weight: 600;
   text-decoration: none;
   padding-left: 4px;
 }
 
-.signup-link:hover {
+.signup-linkAuth:hover {
   text-decoration: underline;
+}
+
+
+/* Base styles stay as they are. Only add/modify below for mobile layout */
+@media (max-width: 600px) {
+  .mobile-background {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .mobile-container {
+    width: 90%;
+    max-width: 350px;
+    padding: 20px 8px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .mobile-logo {
+    width: 90px;
+    height: auto;
+    margin-bottom: 12px;
+  }
+  .logo-block {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  .title-block {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .mobile-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .mobile-subtitle {
+    font-size: 1rem;
+    text-align: center;
+    margin: 0 0 12px 0;
+  }
+  .mobile-login-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .mobile-signup-text {
+    font-size: 0.94rem;
+    text-align: center;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .signup-linkAuth {
+    display: inline-block;
+    color: #0783ee; /* or your theme color */
+    font-weight: bold;
+    margin-left: 2px;
+    text-decoration: underline;
+  }
 }

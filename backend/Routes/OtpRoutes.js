@@ -90,7 +90,7 @@ router.post('/verify-otp', async (req, res) => {
     const storedOtp = await EmailOtpController(email);
 
     if (!storedOtp) return res.status(400).json({ error: 'No OTP found' });
-   
+
     const now = Date.now();
     const expires = new Date(storedOtp.otp_expiresat).getTime();
 
@@ -98,17 +98,15 @@ router.post('/verify-otp', async (req, res) => {
       return res.status(400).json({ error: 'OTP expired' });
     }
 
-
     if (otp.toString().trim() !== storedOtp.otp.toString().trim()) {
       return res.status(400).json({ error: 'Invalid OTP' });
     }
 
-    // Continue rest of code...
     await markOtpVerified(email);
 
     const { data: signupData, error: signupError } = await supabase
       .from('signup')
-      .select('password')
+      .select('password, created_at')
       .eq('email', email)
       .limit(1);
 
@@ -116,11 +114,19 @@ router.post('/verify-otp', async (req, res) => {
       return res.status(400).json({ error: 'User not found for login creation' });
     }
 
+    const signupCreatedAt = signupData[0].created_at;
     const password = signupData[0].password;
 
+    // Insert login entry with created_at copied from signup.created_at
     const { error: loginError } = await supabase
       .from('login')
-      .insert([{ login_email: email, login_password: password }]);
+      .insert([
+        {
+          login_email: email,
+          login_password: password,
+          created_at: signupCreatedAt,
+        },
+      ]);
 
     if (loginError) {
       return res.status(500).json({ error: 'Failed to create login data' });
@@ -162,6 +168,7 @@ router.post('/check-email', async (req, res) => {
 
 
 
+//endpoint to send otp to reset password
 //endpoint to send otp to reset password
 router.post('/send-resetpassword-otp', async (req, res) => {
   const { email } = req.body;
@@ -224,16 +231,18 @@ router.post('/send-resetpassword-otp', async (req, res) => {
              <p>Do not share this OTP with anyone.</p>`,
     });
 
-    // IST offset
     const IST_OFFSET = 5.5 * 60 * 60 * 1000;
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000 + IST_OFFSET).toISOString();
+    const now = new Date();
+    const createdAtIST = new Date(now.getTime() + IST_OFFSET).toISOString();
+    const expiresAt = new Date(now.getTime() + 5 * 60 * 1000 + IST_OFFSET).toISOString();
 
-    // Insert reset OTP entry with IST expiration time
+    // Insert reset OTP entry with IST timestamps
     const { error: insertError } = await supabase.from('password_reset_otps').insert([
       {
         reset_otp_email: email,
         reset_otp: otp,
         reset_otp_expiresat: expiresAt,
+        reset_otp_createdat: createdAtIST,
       },
     ]);
 

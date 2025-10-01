@@ -11,23 +11,41 @@ export const loginController = async (req, res, DBsupabase) => {
   }
 
   try {
-    const { data: results, error: selectError } = await DBsupabase
+    // Verify credentials from login table
+    const { data: loginResults, error: loginError } = await DBsupabase
       .from('login')
       .select('*')
       .eq('login_email', loginEmail)
       .eq('login_password', loginPassword)
       .limit(1);
 
-    if (selectError) {
-      console.error('Login query error:', selectError);
+    if (loginError) {
+      console.error('Login query error:', loginError);
       return res.status(500).json({ error: 'Database error occurred. Please try again.' });
     }
 
-    if (!results || results.length === 0) {
+    if (!loginResults || loginResults.length === 0) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    const loginId = results[0].login_id;
+    const loginId = loginResults[0].login_id;
+
+    // Get user info from signup table by email
+    const { data: userData, error: userError } = await DBsupabase
+      .from('signup')
+      .select('id, name')
+      .eq('email', loginEmail)
+      .limit(1)
+      .single();
+
+    if (userError) {
+      console.error('Error fetching user info:', userError);
+      return res.status(500).json({ error: 'Unable to fetch user info.' });
+    }
+
+    if (!userData) {
+      return res.status(404).json({ error: 'User not found in signup table.' });
+    }
 
     // IST offset in milliseconds
     const IST_OFFSET = 5.5 * 60 * 60 * 1000;
@@ -46,20 +64,12 @@ export const loginController = async (req, res, DBsupabase) => {
       console.error('Error updating last_login:', updateError);
     }
 
-    // If login record does not have created_at, optionally insert here with IST timestamp.
-    // Usually created_at is set on initial insert/signup, but if needed:
-    
-    const createdAtIST = new Date(now.getTime() + IST_OFFSET).toISOString();
-    const { error: updateCreatedAtError } = await DBsupabase
-      .from('login')
-      .update({ created_at: createdAtIST })
-      .eq('login_id', loginId);
-    if (updateCreatedAtError) {
-      console.error('Error updating created_at:', updateCreatedAtError);
-    }
-    
-
-    return res.status(200).json({ message: 'Login successful', loginId });
+    // Return userId and userName for frontend to store as logged in user info
+    return res.status(200).json({
+      message: 'Login successful',
+      userId: userData.id,
+      userName: userData.name,
+    });
   } catch (err) {
     return res.status(500).json({ error: 'Unexpected error', details: err.message });
   }

@@ -42,11 +42,23 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loginEmail: loginEmail.toLowerCase(), loginPassword }),
       });
+
+      const data = await res.json();
+
       if (res.ok) {
+        // Save user info to localStorage for upload and session management
+        // Adjust properties according to your backend response
+        if (data.userId && data.userName) {
+          localStorage.setItem('loggedInUserId', data.userId);
+          localStorage.setItem('loggedInUserName', data.userName);
+          console.log('Stored user info in localStorage:', data.userId, data.userName);
+        } else {
+          console.warn('User info missing from login response');
+        }
+
         toast.success('Login successful!', { position: 'top-center', duration: 3000 });
         setTimeout(() => navigate('/home'), 2500);
       } else {
-        const data = await res.json();
         toast.error('Login failed: ' + (data.error || data.message), { position: 'top-center', duration: 3000 });
       }
     } catch (error) {

@@ -1,32 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import "./home.css";
+import "./Home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUserCircle,
-  faMoon,
-  faSun,
-  faLaptopCode,
-  faDatabase,
-  faRobot,
-  faBrain,
-  faBroadcastTower,
-  faBolt,
-  faCogs,
-  faHardHat,
-  faDraftingCompass,
-  faGraduationCap,
-  faBook,
-  faBookOpen,
-  faFilePdf,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUserCircle,faMoon,faSun,faLaptopCode,faDatabase,faRobot,faBrain,faBroadcastTower,faBolt, faCogs, faHardHat, faDraftingCompass,  faGraduationCap,  faBook,faBookOpen,  faFilePdf,} from "@fortawesome/free-solid-svg-icons";
 import { createClient } from '@supabase/supabase-js'; // For Supabase client initialization (even if not for auth)
 
-// Initialize Supabase client for frontend (removed)
-// const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-// const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-// console.log('Frontend Supabase URL:', supabaseUrl);
-// console.log('Frontend Supabase Key (first 5 chars):', supabaseKey ? supabaseKey.substring(0, 5) : 'N/A');
 const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY);
 
 const Home = () => {
@@ -45,231 +22,222 @@ const Home = () => {
   const departmentData = {
     "Computer Science": {
       "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
       "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-   
       "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ }
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
     },
     "Information Science": {
       "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming Basics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Digital Logic": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming Basics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Digital Logic": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-      "2 Semester": { /* fill with unique subjects */ },
-      // 
+      "2 Semester": {},
     },
     "AIML": {
       "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
       "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-   
       "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ }
-      
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
     },
-    "AIDS": { "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-   
-      "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ }
-    },
-
-    "ECE": { 
+    "AIDS": {
       "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
       "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-   
       "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ }
-     },
-
-    "EEE": { "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-   
-      "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ } },
-
-    "Mechanical": { "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-   
-      "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
-      },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ } 
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
     },
-
-    "Civil": { "1 Semester": {
-        "Mathematics I": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Programming in C": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Basic Electrical": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Graphics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+    "ECE": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
       "2 Semester": {
-        "Mathematics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Chemistry": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Data Structures": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electronics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Mechanics": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-   
       "3 Semester": {
-        "Mathematics III": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Physics II": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "OOP": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Electrical Machines": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"],
-        "Engineering Drawing": ["Unit 1","Unit 2","Unit 3","Unit 4","Unit 5"]
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
       },
-      "4 Semester": {  },
-      "5 Semester": {    },
-      "6 Semester": {  },
-      "7 Semester": { /* ... */ },
-      "8 Semester": { /* ... */ } 
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
     },
-
+    "EEE": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "3 Semester": {
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
+    },
+    "Mechanical": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "3 Semester": {
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
+    },
+    "Civil": {
+      "1 Semester": {
+        "Mathematics I": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Programming in C": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Basic Electrical": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Graphics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "2 Semester": {
+        "Mathematics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Chemistry": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Data Structures": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electronics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Mechanics": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "3 Semester": {
+        "Mathematics III": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Physics II": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "OOP": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Electrical Machines": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"],
+        "Engineering Drawing": ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+      },
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {}
+    },
     "Architecture": {
-      "1 Semester": { },
-      "2 Semester": {  },
-      "3 Semester": {  },
-      "4 Semester": {  },
-      "5 Semester": {  },
-      "6 Semester": { },
-      "7 Semester": { },
-      "8 Semester":  {},
-      "9 Semester": { },
-      "10 Semester": {  }
-    }
+      "1 Semester": {},
+      "2 Semester": {},
+      "3 Semester": {},
+      "4 Semester": {},
+      "5 Semester": {},
+      "6 Semester": {},
+      "7 Semester": {},
+      "8 Semester": {},
+      "9 Semester": {},
+      "10 Semester": {}
+    },
   };
 
   // Fetch user-specific notes from Supabase storage
@@ -311,7 +279,7 @@ const Home = () => {
 
   // Push and popstate handlers
   useEffect(() => {
-    if (!isPopState.current) {
+    if (!isPopState.current && section !== "home") {
       window.history.pushState({ section, selectedDep, selectedYear, selectedSubject, selectedUnit }, "");
     }
     isPopState.current = false;
@@ -352,18 +320,31 @@ const Home = () => {
       return;
     }
 
-    const userId = localStorage.getItem('loggedInUserId'); // Get userId from localStorage
+    // Get logged-in user ID and user name from localStorage (set them on login/signup)
+    const userId = localStorage.getItem('loggedInUserId');
+    const userName = localStorage.getItem('loggedInUserName');
 
-    if (!userId) {
+    if (!userId || !userName) {
       alert("You must be logged in to upload notes.");
       return;
     }
 
+    // Ensure user has selected all required academic info
+    if (!selectedDep || !selectedYear || !selectedSubject || !selectedUnit) {
+      alert("Please select department, semester, subject, and unit.");
+      return;
+    }
+
+    // Prepare form data to send including all metadata fields
     const formData = new FormData();
-    formData.append("note", file); // 'note' is the field name expected by Multer in the backend
+    formData.append("note", file);
     formData.append("user_id", userId);
-    // formData.append("title_subject", `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`); // Removed
-    formData.append("title", noteTitle.trim()); // New: Send the user-provided title
+    formData.append("user_name", userName);
+    formData.append("department", selectedDep);
+    formData.append("semester", selectedYear);
+    formData.append("subject", selectedSubject);
+    formData.append("unit", selectedUnit);
+    formData.append("title", noteTitle.trim());
 
     try {
       const response = await fetch("http://localhost:5001/notes/upload", {
@@ -375,20 +356,25 @@ const Home = () => {
 
       if (response.ok) {
         alert(data.message);
-        // Update local state if upload is successful
         const key = `${selectedDep}-${selectedYear}-${selectedSubject}-${selectedUnit}`;
+
         setPdfStorage(prev => ({
           ...prev,
           [key]: [...(prev[key] || []), file.name],
         }));
+
         e.target.reset();
+
+        // Optionally, refresh notes list here to show new upload immediately
+        // Or call fetchUserNotes if you refactor fetching to a separate function
       } else {
-        alert(`Upload failed: ${data.message || "Unknown error"}`);
+        alert(`Upload failed: ${data.error || data.message || "Unknown error"}`);
       }
     } catch (error) {
       alert(`An error occurred during upload: ${error.message}`);
     }
   };
+
 
   const getSubjects = () => departmentData[selectedDep]?.[selectedYear] || {};
   const getUnits = () => getSubjects()[selectedSubject] || [];
@@ -405,8 +391,8 @@ const Home = () => {
           <button onClick={() => { setSection("home"); setSelectedDep(""); setSelectedYear(""); setSelectedSubject(""); setSelectedUnit(""); }}>Home</button>
           <button onClick={() => setSection("about")}>About Us</button>
           <button onClick={() => setSection("contact")}>Contact Us</button>
-          <button className="profile-btn"><FontAwesomeIcon icon={faUserCircle}/> Profile</button>
-          <button className="toggle-dark" onClick={toggleDarkMode}><FontAwesomeIcon icon={darkMode ? faSun : faMoon}/></button>
+          <button className="profile-btn"><FontAwesomeIcon icon={faUserCircle} /> Profile</button>
+          <button className="toggle-dark" onClick={toggleDarkMode}><FontAwesomeIcon icon={darkMode ? faSun : faMoon} /></button>
         </nav>
       </header>
 
@@ -418,16 +404,16 @@ const Home = () => {
             {Object.keys(departmentData).map(dep => (
               <div key={dep} className="card" onClick={() => selectDepartment(dep)}>
                 <FontAwesomeIcon icon={
-                  dep==="Computer Science"?faLaptopCode:
-                  dep==="ECE"?faBroadcastTower:
-                  dep==="AIML"?faRobot:
-                  dep==="AIDS"?faBrain:
-                  dep==="EEE"?faBolt:
-                  dep==="Mechanical"?faCogs:
-                  dep==="Civil"?faHardHat:
-                  dep==="Architecture"?faDraftingCompass:
-                  faDatabase
-                }/>
+                  dep === "Computer Science" ? faLaptopCode :
+                    dep === "ECE" ? faBroadcastTower :
+                      dep === "AIML" ? faRobot :
+                        dep === "AIDS" ? faBrain :
+                          dep === "EEE" ? faBolt :
+                            dep === "Mechanical" ? faCogs :
+                              dep === "Civil" ? faHardHat :
+                                dep === "Architecture" ? faDraftingCompass :
+                                  faDatabase
+                } />
                 <h3>{dep}</h3>
               </div>
             ))}
@@ -437,12 +423,12 @@ const Home = () => {
 
       {section === "department" && (
         <section>
-          <button className="back-btn" onClick={()=>setSection("home")}>Back to Home</button>
+          <button className="back-btn" onClick={() => setSection("home")}>Back to Home</button>
           <h2>{selectedDep}</h2>
           <div className="year-list">
-            {Object.keys(departmentData[selectedDep]).map(year=>(
-              <div key={year} className="year-item" onClick={()=>selectYear(year)}>
-                <FontAwesomeIcon icon={faGraduationCap}/>
+            {Object.keys(departmentData[selectedDep]).map(year => (
+              <div key={year} className="year-item" onClick={() => selectYear(year)}>
+                <FontAwesomeIcon icon={faGraduationCap} />
                 <p>{year}</p>
               </div>
             ))}
@@ -452,12 +438,12 @@ const Home = () => {
 
       {section === "subjects" && (
         <section>
-          <button className="back-btn" onClick={()=>setSection("department")}>Back to Semesters</button>
+          <button className="back-btn" onClick={() => setSection("department")}>Back to Semesters</button>
           <h2>{selectedYear} - Subjects</h2>
           <div className="subject-list">
-            {Object.keys(getSubjects()).map(sub=>(
-              <div key={sub} className="year-item" onClick={()=>selectSubject(sub)}>
-                <FontAwesomeIcon icon={faBook}/>
+            {Object.keys(getSubjects()).map(sub => (
+              <div key={sub} className="year-item" onClick={() => selectSubject(sub)}>
+                <FontAwesomeIcon icon={faBook} />
                 <p>{sub}</p>
               </div>
             ))}
@@ -467,12 +453,12 @@ const Home = () => {
 
       {section === "units" && (
         <section>
-          <button className="back-btn" onClick={()=>setSection("subjects")}>Back to Subjects</button>
+          <button className="back-btn" onClick={() => setSection("subjects")}>Back to Subjects</button>
           <h2>{selectedSubject} - Units</h2>
           <div className="unit-list">
-            {getUnits().map(unit=>(
-              <div key={unit} className="year-item" onClick={()=>selectUnit(unit)}>
-                <FontAwesomeIcon icon={faBookOpen}/>
+            {getUnits().map(unit => (
+              <div key={unit} className="year-item" onClick={() => selectUnit(unit)}>
+                <FontAwesomeIcon icon={faBookOpen} />
                 <p>{unit}</p>
               </div>
             ))}
@@ -482,7 +468,7 @@ const Home = () => {
 
       {section === "pdfs" && (
         <section>
-          <button className="back-btn" onClick={()=>setSection("units")}>Back to Units</button>
+          <button className="back-btn" onClick={() => setSection("units")}>Back to Units</button>
           <h2>{selectedUnit} - PDFs</h2>
           <form onSubmit={handlePDFUpload} className="upload-form">
             <input
@@ -493,7 +479,7 @@ const Home = () => {
               required
               className="note-title-input"
             />
-            <input type="file" id="pdf-file" accept=".pdf" required/>
+            <input type="file" id="pdf-file" accept=".pdf" required />
             <button type="submit">Upload</button>
           </form>
           <div className="pdf-list">
@@ -501,12 +487,11 @@ const Home = () => {
             {userNotes.length > 0 ? (
               userNotes.map((note, index) => (
                 <div key={index} className="pdf-item">
-                  <FontAwesomeIcon icon={faFilePdf}/>
+                  <FontAwesomeIcon icon={faFilePdf} />
                   <span>{note.name}</span>
                   <a href={note.url} target="_blank" rel="noopener noreferrer" download={note.name + '.pdf'}>
                     <button className="download-btn">Download</button>
                   </a>
-                  {console.log('Download URL for', note.name, ':', note.url)} {/* Added console.log for URL */}
                 </div>
               ))
             ) : (
@@ -517,15 +502,18 @@ const Home = () => {
       )}
 
       {section === "about" && (
-        <section><h2>About Us</h2><p>Welcome to UniNotes! Share notes across departments and years.</p></section>
+        <section>
+          <h2>About Us</h2>
+          <p>Welcome to UniNotes! Share notes across departments and years.</p>
+        </section>
       )}
       {section === "contact" && (
         <section>
           <h2>Contact Us</h2>
-          <form onSubmit={e=>{e.preventDefault();alert("Message sent!")}}>
-            <input type="text" placeholder="Your Name" required/>
-            <input type="email" placeholder="Your Email" required/>
-            <textarea rows="5" placeholder="Your Message" required/>
+          <form onSubmit={e => { e.preventDefault(); alert("Message sent!") }}>
+            <input type="text" placeholder="Your Name" required />
+            <input type="email" placeholder="Your Email" required />
+            <textarea rows="5" placeholder="Your Message" required />
             <button type="submit">Send</button>
           </form>
         </section>
@@ -535,4 +523,3 @@ const Home = () => {
 };
 
 export default Home;
-
