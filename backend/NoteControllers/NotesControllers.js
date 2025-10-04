@@ -26,19 +26,25 @@ export const notesController = async (req, res, supabase) => {
       return res.status(400).json({ error: "Invalid user ID." });
     }
 
-    // Fetch user_name from signup table by user_id
-    const { data: userData, error: userError } = await supabase
-      .from("signup")
-      .select("name")
-      .eq("id", userIdNum)
-      .single();
+    // Try to fetch user_name from signup table by user_id
+    let user_name = "Unknown User"; // Default fallback
+    try {
+      const { data: userData, error: userError } = await supabase
+        .from("signup")
+        .select("name")
+        .eq("id", userIdNum)
+        .single();
 
-    if (userError || !userData) {
-      console.error("Failed to fetch user name from signup:", userError);
-      return res.status(400).json({ error: "Invalid user ID, user not found." });
+      if (userError) {
+        console.error("Failed to fetch user name from signup:", userError);
+        // Continue with default name instead of failing
+      } else if (userData) {
+        user_name = userData.name;
+      }
+    } catch (fetchError) {
+      console.error("Error fetching user name:", fetchError);
+      // Continue with default name
     }
-
-    const user_name = userData.name;
 
     const uniqueFileName = `${user_id}_${Date.now()}_${file.originalname}`;
 
@@ -67,6 +73,7 @@ export const notesController = async (req, res, supabase) => {
         subject,
         unit,
         note_title: title.trim(),
+        file_name: uniqueFileName,
         created_at: dateIST.toISOString(),
       }])
       .select();
@@ -83,6 +90,7 @@ export const notesController = async (req, res, supabase) => {
     res.status(201).json({
       message: "Note uploaded and info saved successfully",
       noteInfo: data[0],
+      fileUrl: uniqueFileName, // Return file name for download
     });
   } catch (err) {
     console.error("Unexpected error:", err);
