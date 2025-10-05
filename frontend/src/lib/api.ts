@@ -1,5 +1,5 @@
 // API configuration
-export const API_BASE_URL = 'http://localhost:5001';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 // API endpoints
 export const API_ENDPOINTS = {
@@ -15,10 +15,20 @@ export const API_ENDPOINTS = {
   VERIFY_RESET_OTP: '/otp/verify-resetpassword-otp',
   UPDATE_PASSWORD: '/otp/update-password',
   
+  // Profile
+  UPDATE_PROFILE: '/profile/update-profile',
+  GET_PROFILE: '/profile/profile/:userId',
+  
   // Notes
   UPLOAD_NOTE: '/notes/upload',
   GET_NOTES: '/notes',
   DOWNLOAD_NOTE: '/notes/download/:fileName',
+  LIKE_NOTE: '/notes/like',
+  GET_LIKE_STATUS: '/notes/like-status/:noteId/:userId',
+  
+  // AI
+  AI_CHAT: '/ai/chat',
+  AI_SUMMARIZE: '/ai/summarize',
 };
 
 // Helper function to build full URL

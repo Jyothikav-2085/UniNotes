@@ -1,76 +1,95 @@
-export const loginController = async (req, res, DBsupabase) => {
+import supabase from '../db.js';
+
+export const loginController = async (req, res) => {
   const { loginEmail, loginPassword } = req.body;
 
-  console.log("Login request body:", req.body);
-
-  if (!loginEmail || !/\S+@\S+\.\S+/.test(loginEmail)) {
-    return res.status(400).json({ error: 'Invalid email format.' });
-  }
-  if (!loginPassword || loginPassword.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+  if (!loginEmail || !loginPassword) {
+    return res.status(400).json({ error: 'Email and password are required.' });
   }
 
   try {
-    // Verify credentials from login table
-    const { data: loginResults, error: loginError } = await DBsupabase
-      .from('login')
-      .select('*')
-      .eq('login_email', loginEmail)
-      .eq('login_password', loginPassword)
-      .limit(1);
+    // Check if user exists in signup table
+    const { data: signupData, error: signupError } = await supabase
+      .from('signup')
+      .select('id, name, password')
+      .eq('email', loginEmail);
 
-    if (loginError) {
-      console.error('Login query error:', loginError);
-      return res.status(500).json({ error: 'Database error occurred. Please try again.' });
+    if (signupError) {
+      console.error('Supabase error:', signupError);
+      return res.status(500).json({ error: 'Database error occurred.' });
     }
 
-    if (!loginResults || loginResults.length === 0) {
+    if (signupData.length === 0) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    const loginId = loginResults[0].login_id;
+    const user = signupData[0];
 
-    // Get user info from signup table by email
-    const { data: userData, error: userError } = await DBsupabase
+    // Verify password
+    if (user.password !== loginPassword) {
+      return res.status(401).json({ error: 'Invalid email or password.' });
+    }
+
+    // Get created_at from signup table
+    const { data: createdAtData, error: createdAtError } = await supabase
       .from('signup')
-      .select('id, name')
-      .eq('email', loginEmail)
-      .limit(1)
-      .single();
+      .select('created_at')
+      .eq('id', user.id);
 
-    if (userError) {
-      console.error('Error fetching user info:', userError);
-      return res.status(500).json({ error: 'Unable to fetch user info.' });
+    if (createdAtError) {
+      console.error('Supabase error:', createdAtError);
+      return res.status(500).json({ error: 'Database error occurred.' });
     }
 
-    if (!userData) {
-      return res.status(404).json({ error: 'User not found in signup table.' });
-    }
+    const createdAt = createdAtData[0].created_at;
 
-    // IST offset in milliseconds
-    const IST_OFFSET = 5.5 * 60 * 60 * 1000;
-    const now = new Date();
-
-    // Calculate IST timestamps
-    const lastLoginIST = new Date(now.getTime() + IST_OFFSET).toISOString();
-
-    // Update last_login in IST
-    const { error: updateError } = await DBsupabase
+    // Check if login entry already exists
+    const { data: existingLoginData, error: existingLoginError } = await supabase
       .from('login')
-      .update({ last_login: lastLoginIST })
-      .eq('login_id', loginId);
+      .select('id')
+      .eq('login_email', loginEmail);
 
-    if (updateError) {
-      console.error('Error updating last_login:', updateError);
+    if (existingLoginError) {
+      console.error('Supabase error:', existingLoginError);
+      return res.status(500).json({ error: 'Database error occurred.' });
     }
 
-    // Return userId and userName for frontend to store as logged in user info
+    let loginError;
+    
+    if (existingLoginData.length > 0) {
+      // Update existing login entry
+      const { error: updateError } = await supabase
+        .from('login')
+        .update({ 
+          login_password: loginPassword, 
+          created_at: createdAt 
+        })
+        .eq('login_email', loginEmail);
+      
+      loginError = updateError;
+    } else {
+      // Insert new login entry
+      const { error: insertError } = await supabase
+        .from('login')
+        .insert([
+          { login_email: loginEmail, login_password: loginPassword, created_at: createdAt }
+        ]);
+      
+      loginError = insertError;
+    }
+
+    if (loginError) {
+      console.error('Supabase error:', loginError);
+      return res.status(500).json({ error: 'Database error occurred.' });
+    }
+
     return res.status(200).json({
       message: 'Login successful',
-      userId: userData.id,
-      userName: userData.name,
+      userId: user.id,
+      userName: user.name,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Unexpected error', details: err.message });
+    console.error('Login error:', err);
+    return res.status(500).json({ error: 'Unexpected error during login.' });
   }
 };

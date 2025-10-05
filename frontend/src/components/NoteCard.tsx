@@ -58,12 +58,13 @@ export const NoteCard = ({
       transition={{ 
         type: 'spring', 
         stiffness: 300, 
-        damping: 20 
+        damping: 20,
+        duration: 0.2  // Add explicit duration
       }}
       style={{ transformStyle: 'preserve-3d' }}
       className="h-full"
     >
-      <Card className="glass-card border-2 hover:border-primary/50 transition-all duration-300 hover:glow h-full flex flex-col">
+      <Card className="glass-card border-2 hover:border-primary/50 transition-all duration-200 hover:glow h-full flex flex-col">
         <CardHeader>
           <div className="flex items-start justify-between">
             <FileText className="w-8 h-8 text-primary animate-glow" />
@@ -71,11 +72,12 @@ export const NoteCard = ({
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.1 }}  // Faster transition
                 onClick={handleLike}
-                className="p-1 hover:bg-primary/10 rounded-full transition-colors"
+                className="p-1 hover:bg-primary/10 rounded-full transition-colors duration-150"
               >
                 <Heart 
-                  className={`w-5 h-5 transition-colors ${
+                  className={`w-5 h-5 transition-colors duration-150 ${
                     isLiked 
                       ? 'fill-red-500 text-red-500' 
                       : 'text-muted-foreground hover:text-red-500'
@@ -94,7 +96,7 @@ export const NoteCard = ({
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.1, duration: 0.1 }}  // Faster animation
               className="px-3 py-1 text-xs rounded-full glass border border-primary/30 text-primary"
             >
               {department}
@@ -102,7 +104,7 @@ export const NoteCard = ({
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.2, duration: 0.1 }}  // Faster animation
               className="px-3 py-1 text-xs rounded-full glass border border-accent/30 text-accent"
             >
               {semester}
@@ -110,7 +112,7 @@ export const NoteCard = ({
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.1 }}  // Faster animation
               className="px-3 py-1 text-xs rounded-full glass border border-green-500/30 text-green-500"
             >
               {user_name}
@@ -121,7 +123,7 @@ export const NoteCard = ({
         <CardFooter className="flex gap-2">
           <Button
             onClick={() => onView?.(id)}
-            className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all transform hover:scale-105"
+            className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-200 transform hover:scale-105"
           >
             <Eye className="w-4 h-4 mr-2" />
             View
@@ -129,7 +131,7 @@ export const NoteCard = ({
           <Button
             onClick={handleDownload}
             variant="outline"
-            className="glass border-2 hover:border-primary/50 transition-all transform hover:scale-105"
+            className="glass border-2 hover:border-primary/50 transition-all duration-200 transform hover:scale-105"
           >
             <Download className="w-4 h-4" />
           </Button>

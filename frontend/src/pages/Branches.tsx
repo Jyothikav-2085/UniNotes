@@ -62,7 +62,7 @@ export default function Branches() {
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="mb-8"
+          transition={{ duration: 0.3 }}  // Faster transition
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
@@ -73,7 +73,7 @@ export default function Branches() {
               <Button
                 onClick={() => navigate('/profile')}
                 variant="outline"
-                className="glass border-2 hover:border-primary/50 transition-all"
+                className="glass border-2 hover:border-primary/50 transition-all duration-200"
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
@@ -81,7 +81,7 @@ export default function Branches() {
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="glass border-2 hover:border-destructive/50 transition-all"
+                className="glass border-2 hover:border-destructive/50 transition-all duration-200"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -94,13 +94,13 @@ export default function Branches() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1, duration: 0.3 }}  // Faster transition
           className="text-center mb-12"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 20, duration: 0.3 }}  // Faster spring animation
             className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6"
           >
             <GraduationCap className="w-10 h-10 text-white" />
@@ -115,7 +115,7 @@ export default function Branches() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3, duration: 0.3 }}  // Faster transition
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {branches.map((branch, index) => (
@@ -123,16 +123,16 @@ export default function Branches() {
               key={branch.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ delay: 0.4 + index * 0.05, duration: 0.2 }}  // Faster and staggered
+              whileHover={{ scale: 1.03, y: -5 }}  // Simplified hover effect
+              whileTap={{ scale: 0.98 }}
             >
               <Card 
-                className="glass-card border-2 border-white/10 hover:border-primary/50 transition-all cursor-pointer group"
+                className="glass-card border-2 border-white/10 hover:border-primary/50 transition-all duration-200 cursor-pointer group glow"
                 onClick={() => handleBranchSelect(branch.id)}
               >
                 <CardHeader className="text-center">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${branch.color} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-16 h-16 bg-gradient-to-br ${branch.color} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200`}>
                     <GraduationCap className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl font-bold">{branch.name}</CardTitle>
@@ -142,7 +142,7 @@ export default function Branches() {
                 </CardHeader>
                 <CardContent className="text-center">
                   <Button 
-                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleBranchSelect(branch.id);

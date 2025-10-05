@@ -10,9 +10,11 @@ import OTPVerification from "./pages/OTPVerification";
 import ResetPassword from "./pages/ResetPassword";
 import Branches from "./pages/Branches";
 import Semesters from "./pages/Semesters";
+import Subjects from "./pages/Subjects";
 import Dashboard from "./pages/Dashboard";
 import NoteDetail from "./pages/NoteDetail";
 import Profile from "./pages/Profile";
+import AIAssistant from "./pages/AIAssistant";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,9 +33,11 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/branches" element={<Branches />} />
           <Route path="/semesters" element={<Semesters />} />
+          <Route path="/subjects" element={<Subjects />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/note/:id" element={<NoteDetail />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/ai-assistant" element={<AIAssistant />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

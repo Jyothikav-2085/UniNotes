@@ -1,28 +1,29 @@
 import supabase from '../db.js';
 
-const createLogInTable = async () => {
+const createLikesTable = async () => {
   // Supabase automatically creates tables via the dashboard
   // This function ensures the table exists and has the correct structure
   
   // Check if the table exists by trying to select from it
   const { data, error } = await supabase
-    .from('login')
+    .from('note_likes')
     .select('id')
     .limit(1);
 
   if (error && error.code === '42P01') { // Table doesn't exist
-    console.log('LogIn table does not exist. Please create it in the Supabase dashboard with the following structure:');
+    console.log('Note Likes table does not exist. Please create it in the Supabase dashboard with the following structure:');
     console.log(`
-      Table: login
+      Table: note_likes
       Columns:
         id: INTEGER, PRIMARY KEY, AUTO_INCREMENT
-        login_email: VARCHAR(100), NOT NULL
-        login_password: VARCHAR(255), NOT NULL
+        note_id: INTEGER, NOT NULL, REFERENCES notes_info(sl_no) ON DELETE CASCADE
+        user_id: INTEGER, NOT NULL, REFERENCES signup(id) ON DELETE CASCADE
         created_at: TIMESTAMP, DEFAULT CURRENT_TIMESTAMP
+        UNIQUE(note_id, user_id)
     `);
   } else {
-    console.log('LogIn table exists and is ready to use.');
+    console.log('Note Likes table exists and is ready to use.');
   }
 };
 
-export default createLogInTable;
+export default createLikesTable;

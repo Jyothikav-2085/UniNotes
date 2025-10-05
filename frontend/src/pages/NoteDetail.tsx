@@ -4,53 +4,86 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Background3D } from '@/components/Background3D';
 import { ArrowLeft, Download, Share2, Trash2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
-// Sample note data - replace with your actual data fetching
-const sampleNoteDetails = {
-  '1': {
-    title: 'Introduction to React',
-    description: 'Fundamentals of React including components, props, and state',
-    date: '2024-01-15',
-    tags: ['React', 'JavaScript', 'Frontend'],
-    content: `
-# Introduction to React
-
-React is a powerful JavaScript library for building user interfaces. It was developed by Facebook and has become one of the most popular frontend frameworks.
-
-## Key Concepts
-
-### Components
-Components are the building blocks of React applications. They can be functional or class-based.
-
-### Props
-Props allow you to pass data from parent to child components.
-
-### State
-State allows components to manage their own data and re-render when that data changes.
-
-## Getting Started
-
-\`\`\`jsx
-import React from 'react';
-
-function App() {
-  return <h1>Hello React!</h1>;
+interface NoteDetails {
+  sl_no: string;
+  note_title: string;
+  subject: string;
+  department: string;
+  semester: string;
+  user_name: string;
+  file_name: string;
+  created_at: string;
+  // Add other fields as needed
 }
-\`\`\`
-
-This is a simple example of a React component.
-    `,
-    fileUrl: '/sample.pdf',
-  },
-};
 
 export default function NoteDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const [note, setNote] = useState<NoteDetails | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  // Get note data - replace with your actual data fetching
-  const note = id ? sampleNoteDetails[id as keyof typeof sampleNoteDetails] : null;
-
+  useEffect(() => {
+    const fetchNoteDetails = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch notes from backend
+        const response = await fetch(`${API_BASE_URL}/notes`);
+        const data = await response.json();
+        
+        if (response.ok && data.notes) {
+          // Find the note with matching ID
+          const foundNote = data.notes.find((n: NoteDetails) => n.sl_no === id);
+          
+          if (foundNote) {
+            setNote(foundNote);
+          } else {
+            toast({
+              title: "Error",
+              description: "Note not found",
+              variant: "destructive",
+            });
+          }
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to load notes",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching note details:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load note details",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (id) {
+      fetchNoteDetails();
+    }
+  }, [id, toast]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading note details...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!note) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -65,18 +98,52 @@ export default function NoteDetail() {
   }
 
   const handleDownload = () => {
-    // TODO: Connect to your existing download backend
-    console.log('Download note:', id);
+    try {
+      // Create download URL
+      const downloadUrl = `${API_BASE_URL}${API_ENDPOINTS.DOWNLOAD_NOTE.replace(':fileName', note.file_name)}`;
+      
+      // Create temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = note.file_name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Download Started",
+        description: "Your file is being downloaded",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleShare = () => {
     // TODO: Connect to your existing share backend
     console.log('Share note:', id);
+    toast({
+      title: "Note Shared",
+      description: "Note link copied to clipboard",
+    });
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(window.location.href);
   };
 
   const handleDelete = () => {
     // TODO: Connect to your existing delete backend
     console.log('Delete note:', id);
+    toast({
+      title: "Note Deleted",
+      description: "Note has been removed",
+    });
+    navigate('/dashboard');
   };
 
   return (
@@ -111,7 +178,7 @@ export default function NoteDetail() {
                 transition={{ delay: 0.1 }}
                 className="text-4xl md:text-5xl font-bold gradient-text mb-2"
               >
-                {note.title}
+                {note.note_title}
               </motion.h1>
               <motion.p
                 initial={{ x: -20, opacity: 0 }}
@@ -119,7 +186,7 @@ export default function NoteDetail() {
                 transition={{ delay: 0.2 }}
                 className="text-muted-foreground"
               >
-                {note.description}
+                Subject: {note.subject}
               </motion.p>
               <motion.p
                 initial={{ x: -20, opacity: 0 }}
@@ -127,7 +194,15 @@ export default function NoteDetail() {
                 transition={{ delay: 0.3 }}
                 className="text-sm text-muted-foreground mt-2"
               >
-                Created: {note.date}
+                Created: {new Date(note.created_at).toLocaleDateString()}
+              </motion.p>
+              <motion.p
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-sm text-muted-foreground"
+              >
+                Uploaded by: {note.user_name}
               </motion.p>
             </div>
             
@@ -164,26 +239,37 @@ export default function NoteDetail() {
           </div>
           
           {/* Tags */}
-          {note.tags.length > 0 && (
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap gap-2 mt-4"
+          >
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-wrap gap-2 mt-4"
+              className="px-4 py-2 text-sm rounded-full glass border border-primary/30 text-primary"
             >
-              {note.tags.map((tag, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="px-4 py-2 text-sm rounded-full glass border border-primary/30 text-primary"
-                >
-                  {tag}
-                </motion.span>
-              ))}
-            </motion.div>
-          )}
+              {note.department}
+            </motion.span>
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5 }}
+              className="px-4 py-2 text-sm rounded-full glass border border-accent/30 text-accent"
+            >
+              {note.semester}
+            </motion.span>
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6 }}
+              className="px-4 py-2 text-sm rounded-full glass border border-green-500/30 text-green-500"
+            >
+              {note.subject}
+            </motion.span>
+          </motion.div>
         </motion.div>
         
         {/* Content */}
@@ -194,11 +280,24 @@ export default function NoteDetail() {
         >
           <Card className="glass-card border-2 glow">
             <CardHeader>
-              <CardTitle>Note Content</CardTitle>
+              <CardTitle>Note Information</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-invert max-w-none">
-              <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-                {note.content}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">File Details</h3>
+                  <p className="text-muted-foreground">File Name: {note.file_name}</p>
+                  <p className="text-muted-foreground">Uploaded: {new Date(note.created_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Academic Information</h3>
+                  <p className="text-muted-foreground">Department: {note.department}</p>
+                  <p className="text-muted-foreground">Semester: {note.semester}</p>
+                  <p className="text-muted-foreground">Subject: {note.subject}</p>
+                </div>
+                <div className="pt-4">
+                  <p className="text-muted-foreground">To view the full content of this note, please download the file using the button above.</p>
+                </div>
               </div>
             </CardContent>
           </Card>

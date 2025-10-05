@@ -54,9 +54,9 @@ export default function Semesters() {
   };
 
   const handleSemesterSelect = (semesterId: string) => {
-    // Store selected semester and navigate to dashboard
+    // Store selected semester and navigate to subjects
     localStorage.setItem('selectedSemester', semesterId);
-    navigate('/dashboard');
+    navigate('/subjects');
   };
 
   const handleBackToBranches = () => {
@@ -77,14 +77,14 @@ export default function Semesters() {
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="mb-8"
+          transition={{ duration: 0.3 }}  // Faster transition
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
               <Button
                 onClick={handleBackToBranches}
                 variant="ghost"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 transition-all duration-200"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Branches
@@ -98,7 +98,7 @@ export default function Semesters() {
               <Button
                 onClick={() => navigate('/profile')}
                 variant="outline"
-                className="glass border-2 hover:border-primary/50 transition-all"
+                className="glass border-2 hover:border-primary/50 transition-all duration-200"
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
@@ -106,7 +106,7 @@ export default function Semesters() {
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="glass border-2 hover:border-destructive/50 transition-all"
+                className="glass border-2 hover:border-destructive/50 transition-all duration-200"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -119,13 +119,13 @@ export default function Semesters() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1, duration: 0.3 }}  // Faster transition
           className="text-center mb-12"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 20, duration: 0.3 }}  // Faster spring animation
             className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6"
           >
             <BookOpen className="w-10 h-10 text-white" />
@@ -140,7 +140,7 @@ export default function Semesters() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3, duration: 0.3 }}  // Faster transition
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {semesters.map((semester, index) => (
@@ -148,16 +148,16 @@ export default function Semesters() {
               key={semester.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ delay: 0.4 + index * 0.05, duration: 0.2 }}  // Faster and staggered
+              whileHover={{ scale: 1.03, y: -5 }}  // Simplified hover effect
+              whileTap={{ scale: 0.98 }}
             >
               <Card 
-                className="glass-card border-2 border-white/10 hover:border-primary/50 transition-all cursor-pointer group"
+                className="glass-card border-2 border-white/10 hover:border-primary/50 transition-all duration-200 cursor-pointer group glow"
                 onClick={() => handleSemesterSelect(semester.id)}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200">
                     <span className="text-2xl font-bold text-white">{semester.number}</span>
                   </div>
                   <CardTitle className="text-lg font-bold">{semester.name}</CardTitle>
@@ -170,7 +170,7 @@ export default function Semesters() {
                     <p className="text-xs text-muted-foreground mb-2">Key Subjects:</p>
                     <div className="flex flex-wrap gap-1 justify-center">
                       {semester.subjects.slice(0, 2).map((subject, idx) => (
-                        <span key={idx} className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                        <span key={idx} className="text-xs bg-primary/20 text-primary px-2 py-1 rounded transition-all duration-200">
                           {subject}
                         </span>
                       ))}
@@ -180,7 +180,7 @@ export default function Semesters() {
                     </div>
                   </div>
                   <Button 
-                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSemesterSelect(semester.id);

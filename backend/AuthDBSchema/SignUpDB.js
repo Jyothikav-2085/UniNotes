@@ -1,32 +1,29 @@
-import { Client } from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const client = new Client({
-  connectionString: process.env.SUPABASE_DB_URL,
-  ssl: { rejectUnauthorized: false },  
-});
+import supabase from '../db.js';
 
 const createSignUpTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS signup (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      email VARCHAR(100) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+  // Supabase automatically creates tables via the dashboard
+  // This function ensures the table exists and has the correct structure
+  
+  // Check if the table exists by trying to select from it
+  const { data, error } = await supabase
+    .from('signup')
+    .select('id')
+    .limit(1);
 
-  try {
-    await client.connect();
-    await client.query(createTableQuery);
-    console.log('SignUp Table created.');
-  } catch (err) {
-    console.error('Error creating signup table:', err);
-  } finally {
-    await client.end();
+  if (error && error.code === '42P01') { // Table doesn't exist
+    console.log('SignUp table does not exist. Please create it in the Supabase dashboard with the following structure:');
+    console.log(`
+      Table: signup
+      Columns:
+        id: INTEGER, PRIMARY KEY, AUTO_INCREMENT
+        name: VARCHAR(100), NOT NULL
+        email: VARCHAR(100), NOT NULL, UNIQUE
+        password: VARCHAR(255), NOT NULL
+        points: INTEGER, DEFAULT 0
+        created_at: TIMESTAMP, DEFAULT CURRENT_TIMESTAMP
+    `);
+  } else {
+    console.log('SignUp table exists and is ready to use.');
   }
 };
 

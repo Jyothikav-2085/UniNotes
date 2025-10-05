@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { NoteCard } from '@/components/NoteCard';
 import { UploadModal } from '@/components/UploadModal';
 import { Background3D } from '@/components/Background3D';
-import { Plus, Search, LogOut, User } from 'lucide-react';
+import { Plus, Search, LogOut, User, ArrowLeft, Bot } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 // Note interface
 interface Note {
-  id: string;
+  sl_no: string;
   note_title: string;
   subject: string;
   department: string;
@@ -31,26 +31,36 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [selectedSemester, setSelectedSemester] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [likedNotes, setLikedNotes] = useState<Record<string, boolean>>({});
 
   // Check authentication on component mount
   React.useEffect(() => {
     const userId = localStorage.getItem('userId');
     const storedUserName = localStorage.getItem('userName');
-    const selectedBranch = localStorage.getItem('selectedBranch');
-    const selectedSemester = localStorage.getItem('selectedSemester');
+    const branch = localStorage.getItem('selectedBranch');
+    const semester = localStorage.getItem('selectedSemester');
+    const subject = localStorage.getItem('selectedSubject');
     
     if (!userId) {
       navigate('/auth');
       return;
     }
     
-    if (!selectedBranch) {
+    if (!branch) {
       navigate('/branches');
       return;
     }
     
-    if (!selectedSemester) {
+    if (!semester) {
       navigate('/semesters');
+      return;
+    }
+    
+    if (!subject) {
+      navigate('/subjects');
       return;
     }
     
@@ -58,25 +68,37 @@ export default function Dashboard() {
       setUserName(storedUserName);
     }
     
+    setSelectedBranch(branch);
+    setSelectedSemester(semester);
+    setSelectedSubject(subject);
+    
     // Fetch user's notes from backend
     fetchNotes();
   }, [navigate]);
 
   const fetchNotes = async () => {
     try {
-      const selectedBranch = localStorage.getItem('selectedBranch');
-      const selectedSemester = localStorage.getItem('selectedSemester');
+      const branch = localStorage.getItem('selectedBranch');
+      const semester = localStorage.getItem('selectedSemester');
+      const subject = localStorage.getItem('selectedSubject');
       
-      if (!selectedBranch || !selectedSemester) {
+      if (!branch || !semester || !subject) {
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.GET_NOTES}?department=${selectedBranch}&semester=${selectedSemester}`);
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.GET_NOTES}?department=${branch}&semester=${semester}`);
       const data = await response.json();
 
       if (response.ok) {
-        setNotes(data.notes || []);
+        // Filter notes by subject
+        const filteredNotes = data.notes ? data.notes.filter((note: Note) => 
+          note.subject.toLowerCase().includes(subject.toLowerCase())
+        ) : [];
+        setNotes(filteredNotes);
+        
+        // Fetch like status for all notes
+        fetchLikeStatus(filteredNotes);
       } else {
         console.error('Failed to fetch notes:', data.error);
         toast({
@@ -97,6 +119,37 @@ export default function Dashboard() {
     }
   };
 
+  const fetchLikeStatus = async (notes: Note[]) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+
+      const newLikedNotes: Record<string, boolean> = {};
+      
+      // Fetch like status for each note
+      for (const note of notes) {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}${API_ENDPOINTS.GET_LIKE_STATUS}`
+              .replace(':noteId', note.sl_no)
+              .replace(':userId', userId)
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            newLikedNotes[note.sl_no] = data.liked;
+          }
+        } catch (error) {
+          console.error('Error fetching like status:', error);
+        }
+      }
+      
+      setLikedNotes(newLikedNotes);
+    } catch (error) {
+      console.error('Error fetching like statuses:', error);
+    }
+  };
+
   const filteredNotes = notes.filter(note =>
     note.note_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     note.subject.toLowerCase().includes(searchQuery.toLowerCase())
@@ -107,7 +160,14 @@ export default function Dashboard() {
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('selectedBranch');
+    localStorage.removeItem('selectedSemester');
+    localStorage.removeItem('selectedSubject');
     navigate('/auth');
+  };
+
+  const handleBackToSubjects = () => {
+    navigate('/subjects');
   };
 
   const handleUpload = async (data: { title: string; description: string; file: File | null }) => {
@@ -115,13 +175,15 @@ export default function Dashboard() {
     
     try {
       const userId = localStorage.getItem('userId');
-      const selectedBranch = localStorage.getItem('selectedBranch');
-      const selectedSemester = localStorage.getItem('selectedSemester');
+      const branch = localStorage.getItem('selectedBranch');
+      const semester = localStorage.getItem('selectedSemester');
+      const subject = localStorage.getItem('selectedSubject');
       
       console.log('Upload data:', {
         userId,
-        selectedBranch,
-        selectedSemester,
+        branch,
+        semester,
+        subject,
         title: data.title,
         description: data.description
       });
@@ -137,9 +199,9 @@ export default function Dashboard() {
       
       const formData = new FormData();
       formData.append('title', data.title);
-      formData.append('department', selectedBranch || '');
-      formData.append('semester', selectedSemester || '');
-      formData.append('subject', data.description); // Using description as subject for now
+      formData.append('department', branch || '');
+      formData.append('semester', semester || '');
+      formData.append('subject', subject || ''); // Use selected subject
       formData.append('unit', '1'); // Default unit, can be made dynamic later
       formData.append('user_id', userId);
       
@@ -148,7 +210,7 @@ export default function Dashboard() {
       }
 
       console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
+      for (const [key, value] of formData.entries()) {
         console.log(key, value);
       }
 
@@ -192,30 +254,21 @@ export default function Dashboard() {
 
   const handleDownload = async (fileName: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.DOWNLOAD_NOTE.replace(':fileName', fileName)}`);
+      // Create a download link for the file from Supabase storage
+      const downloadUrl = `${API_BASE_URL}${API_ENDPOINTS.DOWNLOAD_NOTE.replace(':fileName', fileName)}`;
       
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        toast({
-          title: "Download Started",
-          description: "Your file is being downloaded",
-        });
-      } else {
-        toast({
-          title: "Download Failed",
-          description: "Failed to download file",
-          variant: "destructive",
-        });
-      }
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Download Started",
+        description: "Your file is being downloaded",
+      });
     } catch (error) {
       console.error('Download error:', error);
       toast({
@@ -226,9 +279,62 @@ export default function Dashboard() {
     }
   };
 
-  const handleLike = (id: string) => {
-    // TODO: Connect to your existing like backend
-    console.log('Like note:', id);
+  const handleLike = async (noteId: string) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        toast({
+          title: "Error",
+          description: "Please login to like notes",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LIKE_NOTE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          noteId,
+          userId,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Update the liked notes state
+        setLikedNotes(prev => ({
+          ...prev,
+          [noteId]: data.liked
+        }));
+        
+        toast({
+          title: data.liked ? "Liked!" : "Unliked!",
+          description: data.liked ? "Note added to your likes" : "Note removed from your likes",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to like note",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Like error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to like note",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAIAssistant = () => {
+    navigate('/ai-assistant');
   };
 
   return (
@@ -244,18 +350,36 @@ export default function Dashboard() {
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="mb-8"
+          transition={{ duration: 0.3 }}  // Faster transition
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-2">UniNotes</h1>
-              <p className="text-muted-foreground">Welcome back, {userName || 'User'}!</p>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={handleBackToSubjects}
+                variant="ghost"
+                className="hover:bg-white/10 transition-all duration-200"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Subjects
+              </Button>
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-2">UniNotes</h1>
+                <p className="text-muted-foreground">Welcome back, {userName || 'User'}!</p>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button
+                onClick={handleAIAssistant}
+                variant="outline"
+                className="glass border-2 hover:border-primary/50 transition-all duration-200"
+              >
+                <Bot className="w-4 h-4 mr-2" />
+                AI Assistant
+              </Button>
+              <Button
                 onClick={() => navigate('/profile')}
                 variant="outline"
-                className="glass border-2 hover:border-primary/50 transition-all"
+                className="glass border-2 hover:border-primary/50 transition-all duration-200"
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
@@ -263,7 +387,7 @@ export default function Dashboard() {
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="glass border-2 hover:border-destructive/50 transition-all"
+                className="glass border-2 hover:border-destructive/50 transition-all duration-200"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -279,12 +403,12 @@ export default function Dashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search notes..."
-                className="glass border-2 focus:border-primary transition-all pl-10"
+                className="glass border-2 focus:border-primary transition-all duration-200 pl-10"
               />
             </div>
             <Button
               onClick={() => setUploadModalOpen(true)}
-              className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all transform hover:scale-105 glow"
+              className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-200 transform hover:scale-105"
               size="lg"
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -297,7 +421,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, duration: 0.3 }}  // Faster transition
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {isLoading ? (
@@ -307,7 +431,7 @@ export default function Dashboard() {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.2 }}  // Faster animation
                 className="glass-card border-2 border-white/10 p-6 rounded-xl"
               >
                 <div className="animate-pulse">
@@ -320,16 +444,24 @@ export default function Dashboard() {
           ) : (
             filteredNotes.map((note, index) => (
             <motion.div
-              key={note.id}
+              key={note.sl_no}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.1, duration: 0.2 }}  // Faster animation
             >
               <NoteCard 
-                {...note} 
+                id={note.sl_no}
+                note_title={note.note_title}
+                subject={note.subject}
+                department={note.department}
+                semester={note.semester}
+                user_name={note.user_name}
+                file_name={note.file_name}
+                created_at={note.created_at}
                 onView={handleViewNote}
                 onDownload={handleDownload}
                 onLike={handleLike}
+                isLiked={likedNotes[note.sl_no] || false}
               />
             </motion.div>
             ))
@@ -340,6 +472,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}  // Faster transition
             className="text-center py-20"
           >
             <p className="text-2xl text-muted-foreground">No notes found</p>

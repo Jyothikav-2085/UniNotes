@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import supabase from './db.js';
+import supabase from './db.js'; // Import Supabase client
 
 import createSignUpTable from './AuthDBSchema/SignUpDB.js'; // Import the function to create the SignUp table
 import { signupController } from './AuthControllers/SignUpControllers.js'; // Import the signup controller
@@ -15,9 +15,13 @@ import createResetPasswordOtpTable from './AuthDBSchema/ResetPasswordOtpDB.js'; 
 import otpRoutes from './Routes/OtpRoutes.js'; // Import OTP routes
 
 import createNotesInfoTable  from './NoteDBSchema/NotesDB.js'; //Import the function to create the notes_ino table
+import createLikesTable from './NoteDBSchema/LikesDB.js'; // Import the function to create the likes table
 import notesRoutes from './Routes/NoteRoutes.js'; // Import Notes routes
 
 import { googleController } from './AuthControllers/GoogleControllers.js'; // Import the Google controller
+
+import profileRoutes from './Routes/ProfileRoutes.js'; // Import Profile routes
+import aiRoutes from './Routes/AIRoutes.js'; // Import AI routes
 
 
 dotenv.config();
@@ -29,34 +33,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Define endpoints and routes
-app.post('/signup', (req, res) => {
-  signupController(req, res, supabase);
-});
+app.post('/signup', signupController);
 
-app.post('/login', (req, res) => {
-  loginController(req, res, supabase);
-});
+app.post('/login', loginController);
 
 app.use('/otp', otpRoutes);
 app.use('/notes', notesRoutes);  
+app.use('/profile', profileRoutes); // Add profile routes
+app.use('/ai', aiRoutes); // Add AI routes
 
-app.post('/google', (req, res) => {
-  googleController(req, res, supabase);
-});
+app.post('/google', googleController);
 
-
-
-// Check Supabase connection on startup
-const checkSupabaseConnection = async () => {
+// Check database connection on startup
+const checkDatabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from('signup').select('id').limit(1);
+    const { data, error } = await supabase
+      .from('signup')
+      .select('id')
+      .limit(1);
+
     if (error) {
-      console.log('Error connecting to Supabase:', error);
+      console.log('Error connecting to Supabase database:', error);
     } else {
       console.log('Connected to Supabase database successfully!');
     }
   } catch (err) {
-    console.log('Unexpected error checking Supabase connection:', err);
+    console.log('Error connecting to Supabase database:', err);
   }
 };
 
@@ -68,13 +70,14 @@ const checkSupabaseConnection = async () => {
     await createEmailOtpTable();
     await createResetPasswordOtpTable();
     await createNotesInfoTable(); 
+    await createLikesTable(); // Create likes table
 
     const PORT = process.env.BACKEND_PORT || 5001;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 
-    await checkSupabaseConnection();
+    await checkDatabaseConnection();
   } catch (err) {
     console.log('Error during startup:', err);
   }
