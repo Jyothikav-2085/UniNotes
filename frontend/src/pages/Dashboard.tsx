@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { NoteCard } from '@/components/NoteCard';
 import { UploadModal } from '@/components/UploadModal';
 import { Background3D } from '@/components/Background3D';
-import { Plus, Search, LogOut, User, ArrowLeft, Bot } from 'lucide-react';
+import { Plus, Search, LogOut, User, ArrowLeft } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
@@ -216,7 +216,7 @@ export default function Dashboard() {
 
       const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.UPLOAD_NOTE}`, {
         method: 'POST',
-        body: formData,
+        body: formData
       });
 
       const result = await response.json();
@@ -248,14 +248,10 @@ export default function Dashboard() {
     }
   };
 
-  const handleViewNote = (id: string) => {
-    navigate(`/note/${id}`);
-  };
-
   const handleDownload = async (fileName: string) => {
     try {
       // Create a download link for the file from Supabase storage
-      const downloadUrl = `${API_BASE_URL}${API_ENDPOINTS.DOWNLOAD_NOTE.replace(':fileName', fileName)}`;
+      const downloadUrl = `${API_BASE_URL}${API_ENDPOINTS.DOWNLOAD_NOTE}`.replace(':fileName', fileName);
       
       // Create a temporary link and trigger download
       const link = document.createElement('a');
@@ -333,10 +329,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleAIAssistant = () => {
-    navigate('/ai-assistant');
-  };
-
   return (
     <div className="min-h-screen p-4 md:p-8 relative overflow-hidden">
       <Background3D />
@@ -368,14 +360,6 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                onClick={handleAIAssistant}
-                variant="outline"
-                className="glass border-2 hover:border-primary/50 transition-all duration-200"
-              >
-                <Bot className="w-4 h-4 mr-2" />
-                AI Assistant
-              </Button>
               <Button
                 onClick={() => navigate('/profile')}
                 variant="outline"
@@ -458,7 +442,6 @@ export default function Dashboard() {
                 user_name={note.user_name}
                 file_name={note.file_name}
                 created_at={note.created_at}
-                onView={handleViewNote}
                 onDownload={handleDownload}
                 onLike={handleLike}
                 isLiked={likedNotes[note.sl_no] || false}

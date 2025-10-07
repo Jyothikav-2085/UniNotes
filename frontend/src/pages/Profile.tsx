@@ -120,10 +120,10 @@ export default function Profile() {
   };
 
   const handleChangePassword = async () => {
-    if (!newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword || !confirmPassword) {
       toast({
         title: "Error",
-        description: "Please fill in both password fields",
+        description: "Please fill in all password fields",
         variant: "destructive",
       });
       return;
@@ -138,11 +138,13 @@ export default function Profile() {
       return;
     }
     
+    // In a real implementation, you would validate the current password with the backend
+    // For now, we'll just show a success message
     setIsLoading(true);
     
     try {
+      // Here we would call the password update API with currentPassword validation
       // For now, we'll just show a success message
-      // In a real implementation, you would call the password update API
       toast({
         title: "Success",
         description: "Password updated successfully!",

@@ -18,10 +18,7 @@ import createNotesInfoTable  from './NoteDBSchema/NotesDB.js'; //Import the func
 import createLikesTable from './NoteDBSchema/LikesDB.js'; // Import the function to create the likes table
 import notesRoutes from './Routes/NoteRoutes.js'; // Import Notes routes
 
-import { googleController } from './AuthControllers/GoogleControllers.js'; // Import the Google controller
-
 import profileRoutes from './Routes/ProfileRoutes.js'; // Import Profile routes
-import aiRoutes from './Routes/AIRoutes.js'; // Import AI routes
 
 
 dotenv.config();
@@ -40,9 +37,6 @@ app.post('/login', loginController);
 app.use('/otp', otpRoutes);
 app.use('/notes', notesRoutes);  
 app.use('/profile', profileRoutes); // Add profile routes
-app.use('/ai', aiRoutes); // Add AI routes
-
-app.post('/google', googleController);
 
 // Check database connection on startup
 const checkDatabaseConnection = async () => {

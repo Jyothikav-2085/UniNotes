@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Eye, Download, Heart } from 'lucide-react';
+import { FileText, Download, Heart } from 'lucide-react';
 import { useState } from 'react';
 
 interface NoteCardProps {
@@ -13,7 +13,6 @@ interface NoteCardProps {
   user_name: string;
   file_name: string;
   created_at: string;
-  onView?: (id: string) => void;
   onDownload?: (fileName: string) => void;
   onLike?: (id: string) => void;
   isLiked?: boolean;
@@ -28,7 +27,6 @@ export const NoteCard = ({
   user_name,
   file_name,
   created_at,
-  onView, 
   onDownload,
   onLike,
   isLiked: initialIsLiked = false 
@@ -122,18 +120,11 @@ export const NoteCard = ({
         
         <CardFooter className="flex gap-2">
           <Button
-            onClick={() => onView?.(id)}
+            onClick={handleDownload}
             className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-200 transform hover:scale-105"
           >
-            <Eye className="w-4 h-4 mr-2" />
-            View
-          </Button>
-          <Button
-            onClick={handleDownload}
-            variant="outline"
-            className="glass border-2 hover:border-primary/50 transition-all duration-200 transform hover:scale-105"
-          >
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4 mr-2" />
+            Download
           </Button>
         </CardFooter>
       </Card>

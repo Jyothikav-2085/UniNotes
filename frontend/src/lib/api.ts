@@ -6,7 +6,6 @@ export const API_ENDPOINTS = {
   // Authentication
   SIGNUP: '/signup',
   LOGIN: '/login',
-  GOOGLE_AUTH: '/google',
   
   // OTP
   SEND_OTP: '/otp/send-otp',
@@ -25,10 +24,6 @@ export const API_ENDPOINTS = {
   DOWNLOAD_NOTE: '/notes/download/:fileName',
   LIKE_NOTE: '/notes/like',
   GET_LIKE_STATUS: '/notes/like-status/:noteId/:userId',
-  
-  // AI
-  AI_CHAT: '/ai/chat',
-  AI_SUMMARIZE: '/ai/summarize',
 };
 
 // Helper function to build full URL
